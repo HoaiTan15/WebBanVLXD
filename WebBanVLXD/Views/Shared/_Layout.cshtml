@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿
+@{
+    var userName = Session["UserName"] != null ? Session["UserName"].ToString() : "Khách";
+    var role = Session["Role"] != null ? Session["Role"].ToString() : "";
+}
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
@@ -147,8 +152,8 @@
                 <i class="fas fa-user fs-5"></i>
             </div>
             <div>
-                <h6 class="mb-0 fw-semibold">Phan Hoài Tân</h6>
-                <small class="text-muted">Admin</small>
+                <h6 class="mb-0 fw-semibold">@userName</h6>
+                <small class="text-muted">@(!string.IsNullOrEmpty(role) ? role : "Khách")</small>
             </div>
         </div>
 
@@ -176,7 +181,6 @@
                     <a href="@Url.Action("Index", "KhuVucKho")" class="nav-link-custom">
                         <i class="fas fa-map-marker-alt"></i>
                         <span>Khu vực kho</span>
-                      
                     </a>
                 </li>
                 <li>
@@ -231,10 +235,20 @@
         </nav>
 
         <div class="logout-section">
-            <a href="@Url.Action("Logout", "Account")" class="d-flex align-items-center gap-2 text-danger text-decoration-none">
-                <i class="fas fa-power-off"></i>
-                <span>Đăng xuất</span>
-            </a>
+            @if (!string.IsNullOrEmpty(Session["UserID"]?.ToString()))
+            {
+                <a href="@Url.Action("Logout", "Account")" class="d-flex align-items-center gap-2 text-danger text-decoration-none">
+                    <i class="fas fa-power-off"></i>
+                    <span>Đăng xuất</span>
+                </a>
+            }
+            else
+            {
+                <a href="@Url.Action("Login", "Account")" class="d-flex align-items-center gap-2 text-primary text-decoration-none">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Đăng nhập</span>
+                </a>
+            }
         </div>
     </div>
 

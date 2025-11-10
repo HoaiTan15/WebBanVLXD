@@ -54,6 +54,60 @@ namespace WebBanVLXD.Controllers
             Session.Clear();
             return RedirectToAction("Login");
         }
+        // ----------------- REGISTER -----------------
+        public ActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Register(string TenNguoiDung, string Email, string MatKhau, string XacNhan, string SDT, string DiaChi)
+        {
+            if (string.IsNullOrWhiteSpace(TenNguoiDung))
+                ModelState.AddModelError("TenNguoiDung", "Họ tên là bắt buộc.");
+            if (string.IsNullOrWhiteSpace(Email))
+                ModelState.AddModelError("Email", "Email là bắt buộc.");
+            if (string.IsNullOrWhiteSpace(MatKhau))
+                ModelState.AddModelError("MatKhau", "Mật khẩu là bắt buộc.");
+            if (MatKhau != XacNhan)
+                ModelState.AddModelError("XacNhan", "Mật khẩu xác nhận không khớp.");
+
+            if (!ModelState.IsValid)
+                return View();
+
+            var existing = db.NGUOIDUNGs.FirstOrDefault(u => u.Email == Email);
+            if (existing != null)
+            {
+                ModelState.AddModelError("Email", "Email này đã được sử dụng.");
+                return View();
+            }
+
+            // ======= Tạo mã người dùng tự động (US0001, US0002, ...) =======
+            int count = db.NGUOIDUNGs.Count() + 1;
+            string maUser = "US" + count.ToString("D4"); // Ví dụ: US0005
+
+            // ======= Tạo tài khoản mới =======
+            var user = new NGUOIDUNG
+            {
+                MaUser = maUser,
+                TenNguoiDung = TenNguoiDung,
+                Email = Email,
+                MatKhau = MatKhau,
+                SDT = SDT,
+                DiaChi = DiaChi,
+                Role = "khach",
+                TrangThai = "HoatDong",
+                NgayTao = DateTime.Now
+            };
+
+            db.NGUOIDUNGs.Add(user);
+            db.SaveChanges();
+
+            TempData["RegisterSuccess"] = "Đăng ký thành công! Hãy đăng nhập.";
+            return RedirectToAction("Login");
+        }
+
 
         // ----------------- FORGOT PASSWORD (view) -----------------
         public ActionResult ForgotPassword()
@@ -64,7 +118,7 @@ namespace WebBanVLXD.Controllers
         // ----------------- Send OTP (AJAX) -----------------
         // Accepts JSON body { "Email": "user@example.com" } or form post
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public JsonResult SendOtp()
         {
             try
@@ -245,5 +299,19 @@ namespace WebBanVLXD.Controllers
                 }
             }
         }
+        //Test hệ thống gửi email thành công không
+        public ActionResult TestEmail()
+        {
+            try
+            {
+                SendEmail("herophan1503@gmail.com", "Test OTP", "<b>Mail thử nghiệm gửi từ WebBanVLXD</b>");
+                return Content("Gửi mail thành công! Hãy kiểm tra hộp thư đến của bạn.");
+            }
+            catch (Exception ex)
+            {
+                return Content("Lỗi khi gửi mail: " + ex.Message);
+            }
+        }
+        
     }
 }

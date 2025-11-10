@@ -97,6 +97,26 @@
   <ItemGroup>
     <Content Include="Content\Site.css" />
     <Content Include="Global.asax" />
+    <Content Include="imagesSanPham\gach1.jpg" />
+    <Content Include="imagesSanPham\gach2.jpg" />
+    <Content Include="imagesSanPham\gach3.jpg" />
+    <Content Include="imagesSanPham\gach4.jpg" />
+    <Content Include="imagesSanPham\nen1.jpg" />
+    <Content Include="imagesSanPham\nen2.jpg" />
+    <Content Include="imagesSanPham\nen3.jpg" />
+    <Content Include="imagesSanPham\nen4.jpg" />
+    <Content Include="imagesSanPham\son1.jpg" />
+    <Content Include="imagesSanPham\son2.jpg" />
+    <Content Include="imagesSanPham\son3.jpg" />
+    <Content Include="imagesSanPham\son4.jpg" />
+    <Content Include="imagesSanPham\thep1.jpg" />
+    <Content Include="imagesSanPham\thep2.jpg" />
+    <Content Include="imagesSanPham\thep3.jpg" />
+    <Content Include="imagesSanPham\thep4.jpg" />
+    <Content Include="imagesSanPham\ximang1.jpg" />
+    <Content Include="imagesSanPham\ximang2.jpg" />
+    <Content Include="imagesSanPham\ximang3.jpg" />
+    <Content Include="imagesSanPham\ximang4.jpg" />
     <Content Include="Models\VLXD_DB.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>VLXD_DB.edmx</DependentUpon>
@@ -170,6 +190,8 @@
     <Content Include="Views\Home\TrangChu.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Account\ForgotPassword.cshtml" />
+    <Content Include="Views\Account\Register.cshtml" />
+    <Content Include="Views\Account\ResetPassword.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
