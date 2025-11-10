@@ -12,20 +12,27 @@ namespace WebBanVLXD.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class NHACUNGCAP
+    public partial class NGUOIDUNG
     {
-        public NHACUNGCAP()
+        public NGUOIDUNG()
         {
+            this.HOADONs = new HashSet<HOADON>();
+            this.HOADONs1 = new HashSet<HOADON>();
             this.HOADONNHAPHANGs = new HashSet<HOADONNHAPHANG>();
-            this.SANPHAMs = new HashSet<SANPHAM>();
         }
     
-        public string MaNCC { get; set; }
-        public string TenNCC { get; set; }
+        public string MaUser { get; set; }
+        public string TenNguoiDung { get; set; }
+        public string MatKhau { get; set; }
+        public string Email { get; set; }
         public string SDT { get; set; }
         public string DiaChi { get; set; }
+        public string Role { get; set; }
+        public string TrangThai { get; set; }
+        public Nullable<System.DateTime> NgayTao { get; set; }
     
+        public virtual ICollection<HOADON> HOADONs { get; set; }
+        public virtual ICollection<HOADON> HOADONs1 { get; set; }
         public virtual ICollection<HOADONNHAPHANG> HOADONNHAPHANGs { get; set; }
-        public virtual ICollection<SANPHAM> SANPHAMs { get; set; }
     }
 }

@@ -12,15 +12,14 @@ namespace WebBanVLXD.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class ChiTietNhap
+    public partial class CTHOADON
     {
-        public int ChiTietNhapID { get; set; }
-        public Nullable<int> PhieuNhapID { get; set; }
-        public Nullable<int> SanPhamID { get; set; }
+        public string MaHD { get; set; }
+        public string MaSP { get; set; }
         public Nullable<int> SoLuong { get; set; }
         public Nullable<decimal> DonGia { get; set; }
     
-        public virtual PhieuNhap PhieuNhap { get; set; }
-        public virtual SanPham SanPham { get; set; }
+        public virtual HOADON HOADON { get; set; }
+        public virtual SANPHAM SANPHAM { get; set; }
     }
 }

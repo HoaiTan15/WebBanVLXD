@@ -12,22 +12,21 @@ namespace WebBanVLXD.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class PhieuXuat
+    public partial class HOADONNHAPHANG
     {
-        public PhieuXuat()
+        public HOADONNHAPHANG()
         {
-            this.ChiTietXuats = new HashSet<ChiTietXuat>();
+            this.PHIEUNHAPs = new HashSet<PHIEUNHAP>();
         }
     
-        public int PhieuXuatID { get; set; }
-        public Nullable<System.DateTime> NgayXuat { get; set; }
-        public Nullable<int> NhanVienID { get; set; }
-        public Nullable<int> KhachHangID { get; set; }
+        public string MaHDN { get; set; }
+        public Nullable<System.DateTime> NgayNhap { get; set; }
         public Nullable<decimal> TongTien { get; set; }
-        public string GhiChu { get; set; }
+        public string MaNCC { get; set; }
+        public string MaQL { get; set; }
     
-        public virtual ICollection<ChiTietXuat> ChiTietXuats { get; set; }
-        public virtual KhachHang KhachHang { get; set; }
-        public virtual NhanVien NhanVien { get; set; }
+        public virtual NHACUNGCAP NHACUNGCAP { get; set; }
+        public virtual NGUOIDUNG NGUOIDUNG { get; set; }
+        public virtual ICollection<PHIEUNHAP> PHIEUNHAPs { get; set; }
     }
 }

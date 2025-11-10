@@ -25,17 +25,12 @@ namespace WebBanVLXD.Models
             throw new UnintentionalCodeFirstException();
         }
     
-        public DbSet<ChiTietNhap> ChiTietNhaps { get; set; }
-        public DbSet<ChiTietXuat> ChiTietXuats { get; set; }
-        public DbSet<KhachHang> KhachHangs { get; set; }
-        public DbSet<KhuVucKho> KhuVucKhoes { get; set; }
-        public DbSet<NhaCungCap> NhaCungCaps { get; set; }
-        public DbSet<NhanVien> NhanViens { get; set; }
-        public DbSet<PhanQuyen> PhanQuyens { get; set; }
-        public DbSet<PhieuNhap> PhieuNhaps { get; set; }
-        public DbSet<PhieuXuat> PhieuXuats { get; set; }
-        public DbSet<SanPham> SanPhams { get; set; }
-        public DbSet<TaiKhoan> TaiKhoans { get; set; }
-        public DbSet<ThuocTinh> ThuocTinhs { get; set; }
+        public DbSet<CTHOADON> CTHOADONs { get; set; }
+        public DbSet<HOADON> HOADONs { get; set; }
+        public DbSet<HOADONNHAPHANG> HOADONNHAPHANGs { get; set; }
+        public DbSet<NGUOIDUNG> NGUOIDUNGs { get; set; }
+        public DbSet<NHACUNGCAP> NHACUNGCAPs { get; set; }
+        public DbSet<PHIEUNHAP> PHIEUNHAPs { get; set; }
+        public DbSet<SANPHAM> SANPHAMs { get; set; }
     }
 }

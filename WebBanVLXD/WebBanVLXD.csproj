@@ -48,6 +48,7 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
@@ -98,8 +99,8 @@
     <Content Include="Global.asax" />
     <Content Include="Models\VLXD_DB.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>VLXD_DB.Context.cs</LastGenOutput>
       <DependentUpon>VLXD_DB.edmx</DependentUpon>
+      <LastGenOutput>VLXD_DB.Context.cs</LastGenOutput>
     </Content>
     <Content Include="Models\VLXD_DB.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -115,41 +116,26 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\ChiTietNhap.cs">
+    <Compile Include="Models\CTHOADON.cs">
       <DependentUpon>VLXD_DB.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\ChiTietXuat.cs">
+    <Compile Include="Models\HOADON.cs">
       <DependentUpon>VLXD_DB.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\KhachHang.cs">
+    <Compile Include="Models\HOADONNHAPHANG.cs">
       <DependentUpon>VLXD_DB.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\KhuVucKho.cs">
+    <Compile Include="Models\NGUOIDUNG.cs">
       <DependentUpon>VLXD_DB.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\NhaCungCap.cs">
+    <Compile Include="Models\NHACUNGCAP.cs">
       <DependentUpon>VLXD_DB.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\NhanVien.cs">
-      <DependentUpon>VLXD_DB.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\PhanQuyen.cs">
-      <DependentUpon>VLXD_DB.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\PhieuNhap.cs">
-      <DependentUpon>VLXD_DB.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\PhieuXuat.cs">
+    <Compile Include="Models\PHIEUNHAP.cs">
       <DependentUpon>VLXD_DB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\QuenMatKhau.cs" />
-    <Compile Include="Models\SanPham.cs">
-      <DependentUpon>VLXD_DB.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\TaiKhoan.cs">
-      <DependentUpon>VLXD_DB.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\ThuocTinh.cs">
+    <Compile Include="Models\SANPHAM.cs">
       <DependentUpon>VLXD_DB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\VLXD_DB.Context.cs">
@@ -183,6 +169,7 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\TrangChu.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
+    <Content Include="Views\Account\ForgotPassword.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
