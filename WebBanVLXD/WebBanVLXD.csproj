@@ -48,6 +48,7 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
@@ -117,73 +118,33 @@
     <Content Include="imagesSanPham\ximang2.jpg" />
     <Content Include="imagesSanPham\ximang3.jpg" />
     <Content Include="imagesSanPham\ximang4.jpg" />
-    <Content Include="Models\VLXD_DB.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>VLXD_DB.edmx</DependentUpon>
-      <LastGenOutput>VLXD_DB.Context.cs</LastGenOutput>
-    </Content>
-    <Content Include="Models\VLXD_DB.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>VLXD_DB.edmx</DependentUpon>
-      <LastGenOutput>VLXD_DB.cs</LastGenOutput>
-    </Content>
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\SanPhamController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\CTHOADON.cs">
-      <DependentUpon>VLXD_DB.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\HOADON.cs">
-      <DependentUpon>VLXD_DB.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\HOADONNHAPHANG.cs">
-      <DependentUpon>VLXD_DB.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\NGUOIDUNG.cs">
-      <DependentUpon>VLXD_DB.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\NHACUNGCAP.cs">
-      <DependentUpon>VLXD_DB.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\PHIEUNHAP.cs">
-      <DependentUpon>VLXD_DB.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\QuenMatKhau.cs" />
-    <Compile Include="Models\SANPHAM.cs">
-      <DependentUpon>VLXD_DB.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\VLXD_DB.Context.cs">
+    <Compile Include="Models\VLXD_DB.designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>VLXD_DB.Context.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\VLXD_DB.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>VLXD_DB.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\VLXD_DB.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>VLXD_DB.edmx</DependentUpon>
+      <DependentUpon>VLXD_DB.dbml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\web.config" />
-    <EntityDeploy Include="Models\VLXD_DB.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>VLXD_DB.Designer.cs</LastGenOutput>
-    </EntityDeploy>
-    <Content Include="Models\VLXD_DB.edmx.diagram">
-      <DependentUpon>VLXD_DB.edmx</DependentUpon>
+    <Content Include="Models\VLXD_DB.dbml">
+      <Generator>MSLinqToSQLGenerator</Generator>
+      <LastGenOutput>VLXD_DB.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </Content>
+    <None Include="Models\VLXD_DB.dbml.layout">
+      <DependentUpon>VLXD_DB.dbml</DependentUpon>
+    </None>
     <None Include="packages.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
@@ -192,6 +153,7 @@
     <Content Include="Views\Account\ForgotPassword.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Account\ResetPassword.cshtml" />
+    <Content Include="Views\SanPham\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -203,6 +165,7 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
+    <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <PropertyGroup>

@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 12" name="VLXD_DB">
+  <DataContextMoniker Name="/VLXD_DBDataContext" />
+  <nestedChildShapes>
+    <classShape Id="b994375f-598a-47d4-9473-0f5a9e29c9a6" absoluteBounds="6.25, 6.25, 2, 1.5785953776041666">
+      <DataClassMoniker Name="/VLXD_DBDataContext/CTHOADON" />
+      <nestedChildShapes>
+        <elementListCompartment Id="e7ceb97e-d747-49c5-9d8c-b264304bc96f" absoluteBounds="6.265, 6.71, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="8189d4e6-9acc-44f9-b750-973b2787e6aa" absoluteBounds="3.5, 9.375, 2, 2.3478011067708344">
+      <DataClassMoniker Name="/VLXD_DBDataContext/SANPHAM" />
+      <nestedChildShapes>
+        <elementListCompartment Id="662de62a-a548-4f71-b834-2401371185f1" absoluteBounds="3.515, 9.835, 1.9700000000000002, 1.7878011067708335" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="530dd2d6-be33-4d76-b251-0fea85963f06" absoluteBounds="3.5, 6, 2, 2.1554996744791666">
+      <DataClassMoniker Name="/VLXD_DBDataContext/HOADON" />
+      <nestedChildShapes>
+        <elementListCompartment Id="3ef39193-2524-4894-b832-2404d1843444" absoluteBounds="3.515, 6.46, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="4a328eff-3241-4341-9504-3f116d8cda90" absoluteBounds="3.5, 2.625, 2, 1.7708968098958335">
+      <DataClassMoniker Name="/VLXD_DBDataContext/HOADONNHAPHANG" />
+      <nestedChildShapes>
+        <elementListCompartment Id="ed82790c-a4c6-4582-a628-d69f69c5931a" absoluteBounds="3.515, 3.085, 1.9700000000000002, 1.2108968098958333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="7ef98302-2ee8-4150-a8fc-8e77d4564f8e" absoluteBounds="0.75, 3.25, 2, 2.5401025390624992">
+      <DataClassMoniker Name="/VLXD_DBDataContext/NGUOIDUNG" />
+      <nestedChildShapes>
+        <elementListCompartment Id="70d4fd2c-6149-4e16-97fc-54ca407e830c" absoluteBounds="0.765, 3.71, 1.9700000000000002, 1.9801025390625" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="1c8bd5de-a3e0-4571-9a59-42df3c855c7a" absoluteBounds="0.75, 0.75, 2, 1.5785953776041666">
+      <DataClassMoniker Name="/VLXD_DBDataContext/NHACUNGCAP" />
+      <nestedChildShapes>
+        <elementListCompartment Id="6338a56b-5244-441b-8f34-7215d88d0cb1" absoluteBounds="0.765, 1.21, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="335e4c84-af21-4bb6-8f64-83c58c0156cb" absoluteBounds="6.25, 2.75, 2, 1.5785953776041666">
+      <DataClassMoniker Name="/VLXD_DBDataContext/PHIEUNHAP" />
+      <nestedChildShapes>
+        <elementListCompartment Id="7c4ba33f-0573-47fd-ac2d-6a31f2ea0281" absoluteBounds="6.265, 3.21, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(5.5 : 10.5489005533854); (7.25 : 10.5489005533854); (7.25 : 7.82859537760417)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/VLXD_DBDataContext/SANPHAM/SANPHAM_CTHOADON" />
+      <nodes>
+        <classShapeMoniker Id="8189d4e6-9acc-44f9-b750-973b2787e6aa" />
+        <classShapeMoniker Id="b994375f-598a-47d4-9473-0f5a9e29c9a6" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(5.5 : 7.03929768880208); (5.79166666666667 : 7.03929768880208 : JumpStart); (5.95833333333333 : 7.03929768880208 : JumpEnd); (6.25 : 7.03929768880208)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/VLXD_DBDataContext/HOADON/HOADON_CTHOADON" />
+      <nodes>
+        <classShapeMoniker Id="530dd2d6-be33-4d76-b251-0fea85963f06" />
+        <classShapeMoniker Id="b994375f-598a-47d4-9473-0f5a9e29c9a6" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(1.75 : 5.7901025390625); (1.75 : 7.07774983723958); (3.04166666666667 : 7.07774983723958 : JumpStart); (3.20833333333333 : 7.07774983723958 : JumpEnd); (3.5 : 7.07774983723958)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/VLXD_DBDataContext/NGUOIDUNG/NGUOIDUNG_HOADON" />
+      <nodes>
+        <classShapeMoniker Id="7ef98302-2ee8-4150-a8fc-8e77d4564f8e" />
+        <classShapeMoniker Id="530dd2d6-be33-4d76-b251-0fea85963f06" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(2.2812525 : 5.7901025390625); (2.2812525 : 6.50762241861979); (3.04166666666667 : 6.50762241861979 : JumpStart); (3.20833333333333 : 6.50762241861979 : JumpEnd); (3.5 : 6.50762241861979)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/VLXD_DBDataContext/NGUOIDUNG/NGUOIDUNG_HOADON1" />
+      <nodes>
+        <classShapeMoniker Id="7ef98302-2ee8-4150-a8fc-8e77d4564f8e" />
+        <classShapeMoniker Id="530dd2d6-be33-4d76-b251-0fea85963f06" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(2.75 : 3.82294840494792); (3.04166666666667 : 3.82294840494792 : JumpStart); (3.20833333333333 : 3.82294840494792 : JumpEnd); (3.5 : 3.82294840494792)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/VLXD_DBDataContext/NGUOIDUNG/NGUOIDUNG_HOADONNHAPHANG" />
+      <nodes>
+        <classShapeMoniker Id="7ef98302-2ee8-4150-a8fc-8e77d4564f8e" />
+        <classShapeMoniker Id="4a328eff-3241-4341-9504-3f116d8cda90" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(2.75 : 2.32859537760417); (3.125 : 2.70359537760417); (3.125 : 10.5489005533854); (3.5 : 10.5489005533854)]" fixedFrom="NotFixed" fixedTo="Algorithm">
+      <AssociationMoniker Name="/VLXD_DBDataContext/NHACUNGCAP/NHACUNGCAP_SANPHAM" />
+      <nodes>
+        <classShapeMoniker Id="1c8bd5de-a3e0-4571-9a59-42df3c855c7a" />
+        <classShapeMoniker Id="8189d4e6-9acc-44f9-b750-973b2787e6aa" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(2.75 : 1.50804518880208); (4.5 : 1.50804518880208); (4.5 : 2.625)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/VLXD_DBDataContext/NHACUNGCAP/NHACUNGCAP_HOADONNHAPHANG" />
+      <nodes>
+        <classShapeMoniker Id="1c8bd5de-a3e0-4571-9a59-42df3c855c7a" />
+        <classShapeMoniker Id="4a328eff-3241-4341-9504-3f116d8cda90" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(5.5 : 3.53929768880208); (6.25 : 3.53929768880208)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/VLXD_DBDataContext/HOADONNHAPHANG/HOADONNHAPHANG_PHIEUNHAP" />
+      <nodes>
+        <classShapeMoniker Id="4a328eff-3241-4341-9504-3f116d8cda90" />
+        <classShapeMoniker Id="335e4c84-af21-4bb6-8f64-83c58c0156cb" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(5.5 : 9.375); (5.875 : 9); (5.875 : 3.96519853320312); (6.25 : 3.96519853320312)]" fixedFrom="NotFixed" fixedTo="Algorithm">
+      <AssociationMoniker Name="/VLXD_DBDataContext/SANPHAM/SANPHAM_PHIEUNHAP" />
+      <nodes>
+        <classShapeMoniker Id="8189d4e6-9acc-44f9-b750-973b2787e6aa" />
+        <classShapeMoniker Id="335e4c84-af21-4bb6-8f64-83c58c0156cb" />
+      </nodes>
+    </associationConnector>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>

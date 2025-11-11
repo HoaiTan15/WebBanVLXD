@@ -14,7 +14,10 @@ namespace WebBanVLXD.Controllers
 {
     public class AccountController : Controller
     {
-        VLXD_DBEntities db = new VLXD_DBEntities();
+
+        VLXD_DBDataContext db = new VLXD_DBDataContext(
+            System.Configuration.ConfigurationManager.ConnectionStrings["VLXD_DBConnectionString"].ConnectionString
+        );
 
         private static readonly ObjectCache TokenCache = MemoryCache.Default;
         private const int TokenExpirationHours = 1;
@@ -38,11 +41,11 @@ namespace WebBanVLXD.Controllers
                 Session["Role"] = user.Role;
 
                 if (user.Role == "admin")
-                    return RedirectToAction("TrangChu", "Home");
+                    return RedirectToAction("Index", "SanPham");
                 else if (user.Role == "quanly")
                     return RedirectToAction("Index", "SanPham");
                 else
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "SanPham");
             }
 
             ViewBag.Error = "Sai email hoặc mật khẩu!";
@@ -54,6 +57,7 @@ namespace WebBanVLXD.Controllers
             Session.Clear();
             return RedirectToAction("Login");
         }
+
         // ----------------- REGISTER -----------------
         public ActionResult Register()
         {
@@ -85,7 +89,7 @@ namespace WebBanVLXD.Controllers
 
             // ======= Tạo mã người dùng tự động (US0001, US0002, ...) =======
             int count = db.NGUOIDUNGs.Count() + 1;
-            string maUser = "US" + count.ToString("D4"); // Ví dụ: US0005
+            string maUser = "US" + count.ToString("D4");
 
             // ======= Tạo tài khoản mới =======
             var user = new NGUOIDUNG
@@ -101,13 +105,12 @@ namespace WebBanVLXD.Controllers
                 NgayTao = DateTime.Now
             };
 
-            db.NGUOIDUNGs.Add(user);
-            db.SaveChanges();
+            db.NGUOIDUNGs.InsertOnSubmit(user);
+            db.SubmitChanges();
 
             TempData["RegisterSuccess"] = "Đăng ký thành công! Hãy đăng nhập.";
             return RedirectToAction("Login");
         }
-
 
         // ----------------- FORGOT PASSWORD (view) -----------------
         public ActionResult ForgotPassword()
@@ -116,9 +119,7 @@ namespace WebBanVLXD.Controllers
         }
 
         // ----------------- Send OTP (AJAX) -----------------
-        // Accepts JSON body { "Email": "user@example.com" } or form post
         [HttpPost]
-        //[ValidateAntiForgeryToken]
         public JsonResult SendOtp()
         {
             try
@@ -131,8 +132,6 @@ namespace WebBanVLXD.Controllers
                 }
 
                 string email = null;
-
-                // Try parse JSON body
                 if (!string.IsNullOrWhiteSpace(requestBody))
                 {
                     try
@@ -142,13 +141,9 @@ namespace WebBanVLXD.Controllers
                         if (dict != null && dict.ContainsKey("Email"))
                             email = dict["Email"];
                     }
-                    catch
-                    {
-                        // ignore parsing errors
-                    }
+                    catch { }
                 }
 
-                // fallback to form data
                 if (string.IsNullOrEmpty(email))
                     email = Request.Form["Email"];
 
@@ -158,20 +153,16 @@ namespace WebBanVLXD.Controllers
                 var account = db.NGUOIDUNGs.FirstOrDefault(u => u.Email == email && u.TrangThai == "HoatDong");
                 if (account == null)
                 {
-                    // Do not reveal whether email exists — return generic success
                     return Json(new { success = true, message = "Nếu email tồn tại, mã OTP sẽ được gửi trong vài phút." });
                 }
 
-                // generate OTP and cache it (10 minutes)
                 var otp = new Random().Next(100000, 999999).ToString();
                 var policyOtp = new CacheItemPolicy { AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(10) };
                 TokenCache.Set($"otp:{email.ToLowerInvariant()}", otp, policyOtp);
 
-                // optional: also store attempts/count to rate-limit (not implemented)
-
                 var body = $@"Xin chào {account.TenNguoiDung},<br/>
                               Mã xác thực (OTP) của bạn là: <strong>{otp}</strong><br/>
-                              Mã có hiệu lực trong 10 phút. Nếu bạn không yêu cầu, vui lòng bỏ qua email này.";
+                              Mã có hiệu lực trong 10 phút.";
 
                 try
                 {
@@ -180,8 +171,6 @@ namespace WebBanVLXD.Controllers
                 catch (Exception ex)
                 {
                     System.Diagnostics.Debug.WriteLine("SendEmail error: " + ex.Message);
-                    // still return generic success so we don't reveal info
-                    return Json(new { success = true, message = "Yêu cầu đã được gửi (hoặc đang chờ xử lý)." });
                 }
 
                 return Json(new { success = true, message = "Mã OTP đã được gửi. Kiểm tra email." });
@@ -193,7 +182,7 @@ namespace WebBanVLXD.Controllers
             }
         }
 
-        // ----------------- Verify OTP (form submit) -----------------
+        // ----------------- Verify OTP -----------------
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult VerifyOtp(string Email, string Otp)
@@ -211,7 +200,6 @@ namespace WebBanVLXD.Controllers
                 return View("ForgotPassword");
             }
 
-            // OTP valid -> create reset token (re-use existing ResetPassword flow)
             var account = db.NGUOIDUNGs.FirstOrDefault(u => u.Email == Email && u.TrangThai == "HoatDong");
             if (account == null)
             {
@@ -221,13 +209,9 @@ namespace WebBanVLXD.Controllers
 
             var resetToken = Guid.NewGuid().ToString("N");
             var policy = new CacheItemPolicy { AbsoluteExpiration = DateTimeOffset.Now.AddHours(TokenExpirationHours) };
-            // store mapping token -> MaUser (so ResetPassword can use it)
             TokenCache.Set(resetToken, account.MaUser, policy);
-
-            // remove used OTP
             TokenCache.Remove($"otp:{Email.ToLowerInvariant()}");
 
-            // redirect to ResetPassword with token
             return RedirectToAction("ResetPassword", new { token = resetToken });
         }
 
@@ -264,7 +248,7 @@ namespace WebBanVLXD.Controllers
                 return View(model);
             }
 
-            var account = db.NGUOIDUNGs.Find(maUser);
+            var account = db.NGUOIDUNGs.SingleOrDefault(u => u.MaUser == maUser);
             if (account == null)
             {
                 ModelState.AddModelError("", "Tài khoản không tồn tại.");
@@ -272,7 +256,7 @@ namespace WebBanVLXD.Controllers
             }
 
             account.MatKhau = model.MatKhauMoi;
-            db.SaveChanges();
+            db.SubmitChanges();
             TokenCache.Remove(model.Token);
 
             TempData["ResetSuccess"] = "Mật khẩu đã được cập nhật. Vui lòng đăng nhập.";
@@ -299,7 +283,8 @@ namespace WebBanVLXD.Controllers
                 }
             }
         }
-        //Test hệ thống gửi email thành công không
+
+        // ----------------- TEST EMAIL -----------------
         public ActionResult TestEmail()
         {
             try
@@ -312,6 +297,5 @@ namespace WebBanVLXD.Controllers
                 return Content("Lỗi khi gửi mail: " + ex.Message);
             }
         }
-        
     }
 }
