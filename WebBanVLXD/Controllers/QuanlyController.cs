@@ -27,14 +27,31 @@ namespace WebBanVLXD.Controllers
         }
 
         // ======================= QUẢN LÝ SẢN PHẨM =======================
-        public ActionResult QLSanPham()
+        public ActionResult QLSanPham(string keyword, string tonkho)
         {
             List<SANPHAM> sanPhams = new List<SANPHAM>();
 
             using (SqlConnection conn = new SqlConnection(connStr))
             {
-                string sql = "SELECT MaSP, TenSP, DonGia, DonViTinh, SoLuongTon, HinhAnh, MoTa, MaNCC, MaDM FROM SANPHAM";
+                string sql = @"
+            SELECT MaSP, TenSP, DonGia, DonViTinh, SoLuongTon, HinhAnh, MoTa, MaNCC, MaDM
+            FROM SANPHAM
+            WHERE 
+                (@kw IS NULL 
+                 OR MaSP LIKE '%' + @kw + '%'
+                 OR TenSP LIKE '%' + @kw + '%')
+                AND
+                (
+                    @tk = 'all' 
+                    OR (@tk = 'instock' AND SoLuongTon > 0)
+                    OR (@tk = 'outstock' AND SoLuongTon = 0)
+                )
+            ORDER BY SoLuongTon DESC";
+
                 SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@kw", string.IsNullOrEmpty(keyword) ? (object)DBNull.Value : keyword);
+                cmd.Parameters.AddWithValue("@tk", string.IsNullOrEmpty(tonkho) ? "all" : tonkho);
+
                 conn.Open();
                 SqlDataReader rd = cmd.ExecuteReader();
 
@@ -54,6 +71,10 @@ namespace WebBanVLXD.Controllers
                     });
                 }
             }
+
+            // Gửi lại các lựa chọn đã chọn
+            ViewBag.Keyword = keyword;
+            ViewBag.TonKho = tonkho;
 
             return View(sanPhams);
         }
@@ -121,17 +142,30 @@ namespace WebBanVLXD.Controllers
             return RedirectToAction("QLSanPham");
         }
 
-        // ========== DANH SÁCH PHIẾU NHẬP ==========
-        public ActionResult QLNhapHang()
+        // ========== DANH SÁCH PHIẾU NHẬP + TÌM KIẾM ==========
+        public ActionResult QLNhapHang(string search)
         {
             List<HOADONNHAPHANG> dsPhieu = new List<HOADONNHAPHANG>();
 
             using (SqlConnection conn = new SqlConnection(connStr))
             {
-                string sql = "SELECT MaHDN, NgayNhap, TongTien, MaNCC, MaQL FROM HOADONNHAPHANG ORDER BY NgayNhap DESC";
+                string sql = @"
+            SELECT MaHDN, NgayNhap, TongTien, MaNCC, MaQL 
+            FROM HOADONNHAPHANG
+            WHERE 
+                (@search IS NULL 
+                 OR MaHDN LIKE '%' + @search + '%'
+                 OR MaNCC LIKE '%' + @search + '%'
+                 OR CONVERT(VARCHAR, NgayNhap, 105) LIKE '%' + @search + '%'
+                )
+            ORDER BY NgayNhap DESC";
+
                 SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@search", string.IsNullOrEmpty(search) ? (object)DBNull.Value : search);
+
                 conn.Open();
                 SqlDataReader rd = cmd.ExecuteReader();
+
                 while (rd.Read())
                 {
                     dsPhieu.Add(new HOADONNHAPHANG
@@ -143,9 +177,9 @@ namespace WebBanVLXD.Controllers
                         MaQL = rd["MaQL"].ToString()
                     });
                 }
-
             }
 
+            ViewBag.Search = search;
             return View(dsPhieu);
         }
 
@@ -381,6 +415,79 @@ namespace WebBanVLXD.Controllers
             return View(ds);
         }
 
+        public ActionResult ChiTietDonHang(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return RedirectToAction("QLDonHang");
+
+            id = id.Trim(); // xử lý khoảng trắng
+
+            // Model chứa thông tin hóa đơn
+            HOADON hoaDon = null;
+
+            // Danh sách chi tiết sản phẩm
+            List<Dictionary<string, object>> chiTiet = new List<Dictionary<string, object>>();
+
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                conn.Open();
+
+                // ===== LẤY THÔNG TIN HÓA ĐƠN =====
+                string sqlHD = @"
+            SELECT HD.MaHD, HD.NgayLap, HD.TongTien, HD.TrangThai, HD.PhuongThucTT,
+                   ND.TenNguoiDung, ND.Email, ND.SDT, ND.DiaChi
+            FROM HOADON HD
+            JOIN NGUOIDUNG ND ON HD.MaKH = ND.MaUser
+            WHERE HD.MaHD = @id";
+
+                SqlCommand cmdHD = new SqlCommand(sqlHD, conn);
+                cmdHD.Parameters.AddWithValue("@id", id);
+
+                SqlDataReader rdHD = cmdHD.ExecuteReader();
+                if (rdHD.Read())
+                {
+                    hoaDon = new HOADON
+                    {
+                        MaHD = rdHD["MaHD"].ToString(),
+                        NgayLap = Convert.ToDateTime(rdHD["NgayLap"]),
+                        TongTien = Convert.ToDecimal(rdHD["TongTien"]),
+                        TrangThai = rdHD["TrangThai"].ToString(),
+                        PhuongThucTT = rdHD["PhuongThucTT"].ToString(),
+                        TenKH = rdHD["TenNguoiDung"].ToString(),
+                        Email = rdHD["Email"].ToString(),
+                        SDT = rdHD["SDT"].ToString(),
+                        DiaChi = rdHD["DiaChi"].ToString()
+                    };
+                }
+                rdHD.Close();
+
+                // ===== LẤY CHI TIẾT SẢN PHẨM =====
+                string sqlCT = @"
+            SELECT C.MaSP, S.TenSP, C.SoLuong, C.DonGia,
+                   (C.SoLuong * C.DonGia) AS ThanhTien
+            FROM CTHOADON C
+            JOIN SANPHAM S ON C.MaSP = S.MaSP
+            WHERE C.MaHD = @MaHD";
+
+                SqlCommand cmdCT = new SqlCommand(sqlCT, conn);
+                cmdCT.Parameters.AddWithValue("@MaHD", id);
+
+                SqlDataReader rdCT = cmdCT.ExecuteReader();
+                while (rdCT.Read())
+                {
+                    var item = new Dictionary<string, object>();
+                    item["MaSP"] = rdCT["MaSP"].ToString();
+                    item["TenSP"] = rdCT["TenSP"].ToString();
+                    item["SoLuong"] = rdCT["SoLuong"];
+                    item["DonGia"] = Convert.ToDecimal(rdCT["DonGia"]).ToString("N0") + " đ";
+                    item["ThanhTien"] = Convert.ToDecimal(rdCT["ThanhTien"]).ToString("N0") + " đ";
+                    chiTiet.Add(item);
+                }
+            }
+
+            ViewBag.HoaDon = hoaDon;
+            return View(chiTiet);
+        }
 
     }
 }

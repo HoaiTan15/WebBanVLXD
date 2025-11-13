@@ -16,6 +16,14 @@
         <input type="text" name="mancc" class="form-control w-25" placeholder="Nhập mã nhà cung cấp..." required />
         <button type="submit" class="btn btn-success"><i class="fa fa-plus"></i> Tạo phiếu nhập</button>
     </form>
+    <form method="get" action="@Url.Action("QLNhapHang", "QuanLy")" class="d-flex mb-3">
+        <input type="text" name="search" value="@ViewBag.Search"
+               class="form-control w-25"
+               placeholder="Tìm mã phiếu, NCC hoặc ngày...">
+        <button type="submit" class="btn btn-primary ms-2">
+            <i class="bi bi-search"></i> Tìm
+        </button>
+    </form>
 
     <table class="table table-bordered table-hover text-center align-middle">
         <thead class="table-light">

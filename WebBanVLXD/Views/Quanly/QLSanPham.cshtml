@@ -49,6 +49,26 @@
         </div>
     </form>
 
+    <form method="get" action="@Url.Action("QLSanPham", "QuanLy")" class="d-flex mb-3">
+
+        <input type="text"
+               name="keyword"
+               value="@ViewBag.Keyword"
+               class="form-control w-25 me-2"
+               placeholder="Tìm theo mã hoặc tên sản phẩm...">
+
+        <select name="tonkho" class="form-control w-25 me-2">
+            <option value="all" @(ViewBag.TonKho == "all" || ViewBag.TonKho == null ? "selected" : "")>Tất cả</option>
+            <option value="instock" @(ViewBag.TonKho == "instock" ? "selected" : "")>Còn hàng (Tồn > 0)</option>
+            <option value="outstock" @(ViewBag.TonKho == "outstock" ? "selected" : "")>Hết hàng (Tồn = 0)</option>
+        </select>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-search"></i> Lọc
+        </button>
+    </form>
+
+
     <!-- DANH SÁCH SẢN PHẨM -->
     <table class="table table-bordered table-hover shadow-sm align-middle">
         <thead class="table-light text-center">

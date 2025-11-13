@@ -6,6 +6,19 @@
 }
 
 <div class="container mt-5">
+
+    <!-- HIỂN THỊ THÔNG BÁO -->
+    @if (TempData["Loi"] != null)
+    {
+        <div class="alert alert-danger text-center fw-bold">@TempData["Loi"]</div>
+    }
+
+    @if (TempData["ThongBao"] != null)
+    {
+        <div class="alert alert-success text-center fw-bold">@TempData["ThongBao"]</div>
+    }
+    <!-- ===================== -->
+
     <h4 class="text-center fw-bold mb-4">🛒 Giỏ hàng của bạn</h4>
 
     @if (!Model.Any())
@@ -35,13 +48,18 @@
                         <td>
                             <form action="@Url.Action("CapNhatGio", "KhachHang")" method="post" class="d-inline">
                                 <input type="hidden" name="id" value="@sp.MaSP" />
-                                <input type="number" name="soLuong" value="@sp.SoLuongTon" min="1" class="form-control w-50 d-inline-block" />
+                                <input type="number" name="soLuong" value="@sp.SoLuongTon"
+                                       min="1"
+                                       class="form-control w-50 d-inline-block" />
                                 <button type="submit" class="btn btn-sm btn-outline-primary">Cập nhật</button>
                             </form>
                         </td>
                         <td>@string.Format("{0:N0} đ", sp.DonGia * sp.SoLuongTon)</td>
                         <td>
-                            <a href="@Url.Action("XoaKhoiGio", "KhachHang", new { id = sp.MaSP })" class="btn btn-danger btn-sm">Xóa</a>
+                            <a href="@Url.Action("XoaKhoiGio", "KhachHang", new { id = sp.MaSP.Trim() })"
+                               class="btn btn-danger btn-sm">
+                                Xóa
+                            </a>
                         </td>
                     </tr>
                 }

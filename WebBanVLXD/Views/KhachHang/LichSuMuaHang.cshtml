@@ -26,7 +26,7 @@
                 <td>@hd["PhuongThucTT"]</td>
                 <td>@hd["TrangThai"]</td>
                 <td>
-                    <a href="@Url.Action("ChiTietHoaDon", "KhachHang", new { id = hd["MaHD"] })"
+                    <a href="@Url.Action("ChiTietHoaDon", "KhachHang", new { id = hd["MaHD"].ToString().Trim() })"
                        class="btn btn-outline-primary btn-sm">
                         Xem chi tiết
                     </a>

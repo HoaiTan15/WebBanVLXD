@@ -11,5 +11,7 @@ namespace WebBanVLXD.Models
         public string MaSP { get; set; }
         public int SoLuong { get; set; }
         public decimal DonGia { get; set; }
+
+       
     }
 }

@@ -175,6 +175,7 @@
     <Content Include="Views\KhachHang\LichSuMuaHang.cshtml" />
     <Content Include="Views\KhachHang\ChiTietHoaDon.cshtml" />
     <Content Include="Views\Quanly\QLDonHang.cshtml" />
+    <Content Include="Views\Quanly\ChiTietDonHang.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

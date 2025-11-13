@@ -1,0 +1,51 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+    var hd = ViewBag.HoaDon;
+}
+
+<h3 class="mt-3 text-primary"><i class="bi bi-receipt"></i> Chi tiết đơn hàng @hd.MaHD</h3>
+
+<div class="card mt-3 mb-3 p-3">
+    <h5>Thông tin khách hàng</h5>
+    <p><strong>Họ tên:</strong> @hd.TenKH</p>
+    <p><strong>Email:</strong> @hd.Email</p>
+    <p><strong>SĐT:</strong> @hd.SDT</p>
+    <p><strong>Địa chỉ:</strong> @hd.DiaChi</p>
+</div>
+
+<div class="card p-3">
+    <h5>Thông tin đơn hàng</h5>
+    <p><strong>Ngày lập:</strong> @hd.NgayLap.ToString("dd/MM/yyyy")</p>
+    <p><strong>Phương thức thanh toán:</strong> @hd.PhuongThucTT</p>
+    <p><strong>Trạng thái:</strong> @hd.TrangThai</p>
+</div>
+
+<h4 class="mt-4">Danh sách sản phẩm</h4>
+
+<table class="table table-bordered mt-2">
+    <thead class="table-light">
+        <tr>
+            <th>Mã SP</th>
+            <th>Tên sản phẩm</th>
+            <th>Số lượng</th>
+            <th>Đơn giá</th>
+            <th>Thành tiền</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var sp in Model)
+        {
+            <tr>
+                <td>@sp["MaSP"]</td>
+                <td>@sp["TenSP"]</td>
+                <td>@sp["SoLuong"]</td>
+                <td>@sp["DonGia"]</td>
+                <td>@sp["ThanhTien"]</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h4 class="text-end mt-3 text-danger">
+    <strong>Tổng tiền: @hd.TongTien.ToString("N0") đ</strong>
+</h4>
