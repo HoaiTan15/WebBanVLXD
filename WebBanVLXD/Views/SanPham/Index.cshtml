@@ -6,16 +6,17 @@
 }
 <link href="~/css/Danhmuc.css" rel="stylesheet" />
 
-<!-- DANH MỤC -->
-<div class="container mt-4">
+<!-- ========================= DANH MỤC ========================= -->
+<div class="container mt-5">
     <h5 class="fw-bold mb-3 text-uppercase text-center">Danh mục</h5>
     <div class="row row-cols-2 row-cols-md-4 g-4 justify-content-center">
         @foreach (var dm in danhMucs)
         {
             <div class="col text-center">
-                <a href="@Url.Action("Index", "SanPham", new { madm = dm.MaDM })" class="text-decoration-none text-dark">
+                <a href="@Url.Action("Index","SanPham", new { madm = dm.MaDM, keyword = Request["keyword"] })"
+                   class="text-decoration-none text-dark">
                     <div class="category-card p-3 border rounded-3 bg-white hover-shadow-sm">
-                        <img src="~/@dm.HinhAnh" alt="@dm.TenDM" class="category-img" />
+                        <img src="~/@dm.HinhAnh" class="category-img" />
                         <div class="category-name mt-2">@dm.TenDM</div>
                     </div>
                 </a>
@@ -24,107 +25,95 @@
     </div>
 </div>
 
-<!-- ========================== PHẦN DÀNH CHO ADMIN ========================== -->
+<!-- ========================== ADMIN ========================== -->
 @if (ViewBag.IsAdmin == true)
 {
     <div class="container mt-4 mb-4">
         <div class="alert alert-primary shadow-sm">
-            <h4 class="mb-3">
-                <i class="fa fa-gear"></i> Bảng điều khiển quản trị
-            </h4>
-
-            <div class="d-flex flex-wrap gap-2">
-                <!-- Quản lý tài khoản -->
-                <a href="@Url.Action("QLTaiKhoan", "Admin")" class="btn btn-info">
-                    <i class="fa fa-users"></i> Quản lý tài khoản
-                </a>
-
-                <!-- Quản lý sản phẩm -->
-                <a href="@Url.Action("QLSanPham", "Admin")" class="btn btn-success">
-                    <i class="fa fa-box"></i> Quản lý sản phẩm
-                </a>
-
-                <!-- Phân quyền -->
-                <a href="@Url.Action("PhanQuyen", "Admin")" class="btn btn-warning text-dark">
-                    <i class="fa fa-user-shield"></i> Phân quyền người dùng
-                </a>
-
-                <!-- Thống kê -->
-                <a href="@Url.Action("ThongKe", "Admin")" class="btn btn-secondary">
-                    <i class="fa fa-chart-line"></i> Thống kê hệ thống
-                </a>
+            <h4><i class="fa fa-gear"></i> Bảng điều khiển quản trị</h4>
+            <div class="d-flex flex-wrap gap-2 mt-3">
+                <a href="@Url.Action("QLTaiKhoan","Admin")" class="btn btn-info"><i class="fa fa-users"></i> Quản lý tài khoản</a>
+                <a href="@Url.Action("QLSanPham","Admin")" class="btn btn-success"><i class="fa fa-box"></i> Quản lý sản phẩm</a>
+                <a href="@Url.Action("PhanQuyen","Admin")" class="btn btn-warning text-dark"><i class="fa fa-user-shield"></i> Phân quyền</a>
+                <a href="@Url.Action("ThongKe","Admin")" class="btn btn-secondary"><i class="fa fa-chart-line"></i> Thống kê</a>
             </div>
         </div>
     </div>
 }
 
-<!-- ========================== PHẦN DÀNH CHO QUẢN LÝ ========================== -->
-@if (Session["Role"] != null && Session["Role"].ToString() == "quanly")
+<!-- ========================== QUẢN LÝ ========================== -->
+@{
+    var role = Session["Role"] as string;
+}
+
+@if (role == "quanly")
 {
     <div class="container mt-4 mb-4">
         <div class="alert alert-success shadow-sm">
-            <h4 class="mb-3">
-                <i class="fa fa-briefcase"></i> Bảng điều khiển quản lý
-            </h4>
-
-            <div class="d-flex flex-wrap gap-2">
-                <!-- Quản lý sản phẩm -->
-                <a href="@Url.Action("QLSanPham", "Quanly")" class="btn btn-primary">
-                    <i class="fa fa-box"></i> Quản lý sản phẩm
-                </a>
-
-                <!-- Quản lý nhập hàng -->
-                <a href="@Url.Action("QLNhapHang", "Quanly")" class="btn btn-success">
-                    <i class="fa fa-download"></i> Quản lý nhập hàng
-                </a>
-
-
-
-                <!-- Quản lý tồn kho -->
-                <a href="@Url.Action("QLTonKho", "Quanly")" class="btn btn-info text-white">
-                    <i class="fa fa-cubes"></i> Quản lý tồn kho
-                </a>
-
-                <!-- Báo cáo -->
-                <a href="@Url.Action("BaoCaoDoanhThu", "Quanly")" class="btn btn-danger">
-                    <i class="fa fa-bar-chart"></i> Báo cáo doanh thu
-                </a>
-
-
-                <!-- Quản lý đơn hàng -->
-                <a href="@Url.Action("QLDonHang", "QuanLy")" class="btn btn-primary btn-lg">
-                    <i class="fa fa-box"></i> Quản lý đơn hàng
-                </a>
-
+            <h4><i class="fa fa-briefcase"></i> Bảng điều khiển quản lý</h4>
+            <div class="d-flex flex-wrap gap-2 mt-3">
+                <a href="@Url.Action("QLSanPham","QuanLy")" class="btn btn-primary"><i class="fa fa-box"></i> Quản lý sản phẩm</a>
+                <a href="@Url.Action("QLNhapHang","QuanLy")" class="btn btn-success"><i class="fa fa-download"></i> Nhập hàng</a>
+                <a href="@Url.Action("QLTonKho","QuanLy")" class="btn btn-info text-white"><i class="fa fa-cubes"></i> Tồn kho</a>
+                <a href="@Url.Action("BaoCaoDoanhThu","QuanLy")" class="btn btn-danger"><i class="fa fa-bar-chart"></i> Báo cáo</a>
+                <a href="@Url.Action("QLDonHang","QuanLy")" class="btn btn-primary btn-lg"><i class="fa fa-box"></i> Đơn hàng</a>
             </div>
         </div>
     </div>
 }
 
-
-
-
-<!-- DANH SÁCH SẢN PHẨM -->
+<!-- ========================== SORT + SẢN PHẨM ========================== -->
 <div class="container mt-5">
-    <h5 class="fw-bold mb-3 text-uppercase">Sản phẩm</h5>
-    <div class="row row-cols-2 row-cols-md-4 g-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-uppercase">Sản phẩm</h5>
+
+        <!-- Sắp xếp (không reload trang) -->
+        <select id="sortPrice" class="form-select" style="width:220px">
+            <option value="">-- Sắp xếp theo giá --</option>
+            <option value="asc">Giá thấp → cao</option>
+            <option value="desc">Giá cao → thấp</option>
+        </select>
+    </div>
+
+    <div class="row row-cols-2 row-cols-md-4 g-4" id="productContainer">
         @foreach (var sp in Model)
         {
-            <div class="col">
+            <div class="col product-card" data-price="@sp.DonGia">
                 <div class="card h-100 shadow-sm border-0">
-                    <img src="~/@sp.HinhAnh" class="card-img-top" alt="@sp.TenSP" style="height:180px;object-fit:cover;">
+                    <img src="~/@sp.HinhAnh" class="card-img-top" style="height:180px;object-fit:cover;">
                     <div class="card-body">
                         <h6 class="card-title text-truncate">@sp.TenSP</h6>
                         <p class="text-danger fw-bold">@string.Format("{0:N0} đ", sp.DonGia)</p>
-                        <a href="@Url.Action("ChiTiet", "SanPham", new {id=sp.MaSP.Trim()})" class="btn btn-outline-danger btn-sm w-100">
-                            Xem chi tiết
-                        </a>
+                        <a href="@Url.Action("ChiTiet","SanPham", new { id = sp.MaSP.Trim() })"
+                           class="btn btn-outline-danger btn-sm w-100">Xem chi tiết</a>
                     </div>
                 </div>
             </div>
         }
     </div>
 </div>
+
+@section scripts{
+    <script>
+        // SORT KHÔNG LOAD LẠI TRANG
+        document.getElementById("sortPrice").addEventListener("change", function () {
+
+            const sort = this.value;
+            const container = document.getElementById("productContainer");
+            const items = Array.from(container.querySelectorAll(".product-card"));
+
+            if (sort === "asc") {
+                items.sort((a, b) => a.dataset.price - b.dataset.price);
+            }
+            else if (sort === "desc") {
+                items.sort((a, b) => b.dataset.price - a.dataset.price);
+            }
+
+            items.forEach(item => container.appendChild(item));
+        });
+    </script>
+}
 
 <style>
     .hover-shadow-sm:hover {

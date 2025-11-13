@@ -1,0 +1,82 @@
+﻿@model WebBanVLXD.Models.SANPHAM
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Sửa sản phẩm</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light">
+
+    <div class="container py-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Sửa sản phẩm</h4>
+            </div>
+
+            <div class="card-body">
+
+                <form action="/Admin/SuaSanPham" method="post" enctype="multipart/form-data">
+
+                    <input type="hidden" name="MaSP" value="@Model.MaSP" />
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tên sản phẩm</label>
+                        <input type="text" name="TenSP" class="form-control" value="@Model.TenSP" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Đơn giá</label>
+                        <input type="number" step="0.01" name="DonGia" class="form-control" value="@Model.DonGia" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Đơn vị tính</label>
+                        <input type="text" name="DonViTinh" class="form-control" value="@Model.DonViTinh" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tồn kho</label>
+                        <input type="number" name="SoLuongTon" class="form-control" value="@Model.SoLuongTon" required />
+                    </div>
+
+                    <!-- UPLOAD ẢNH -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Ảnh sản phẩm</label>
+                        <input type="file" name="fileAnh" class="form-control" />
+
+                        <p class="mt-2 text-muted">Ảnh hiện tại:</p>
+                        <img src="/@Model.HinhAnh" style="width:120px;border-radius:6px;border:1px solid #ddd;" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mô tả</label>
+                        <textarea name="MoTa" class="form-control" rows="3">@Model.MoTa</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nhà cung cấp</label>
+                        <input type="text" name="MaNCC" value="@Model.MaNCC" class="form-control" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Danh mục</label>
+                        <input type="text" name="MaDM" value="@Model.MaDM" class="form-control" />
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <a href="/Admin/QLSanPham" class="btn btn-secondary me-2">Hủy</a>
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

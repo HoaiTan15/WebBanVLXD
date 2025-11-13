@@ -70,27 +70,31 @@ namespace WebBanVLXD.Controllers
 
                 var existing = cart.FirstOrDefault(x => x.MaSP == id);
 
-                if (existing != null)
-                {
-                    // Nếu sản phẩm đã có trong giỏ → kiểm tra tổng số lượng mới
-                    if (existing.SoLuongTon + soLuong > tonKho)
+                if(existing != null)
+{
+                    // kiểm tra không vượt quá tồn kho
+                    if (existing.SoLuongMua + soLuong > tonKho)
                     {
-                        TempData["Loi"] = $"❌ Số lượng vượt quá tồn kho! Chỉ còn {tonKho} sản phẩm.";
+                        TempData["Loi"] = $"❌ Số lượng vượt quá tồn kho! Chỉ còn {tonKho}.";
                         return RedirectToAction("GioHang");
                     }
 
-                    existing.SoLuongTon += soLuong;
+                    // cập nhật số lượng khách mua, KHÔNG đụng vào tồn kho
+                    existing.SoLuongMua += soLuong;
                 }
+
                 else
                 {
-                    // 5️⃣ Thêm mới sản phẩm vào giỏ
                     var sp = new SANPHAM
                     {
                         MaSP = rd["MaSP"].ToString(),
                         TenSP = rd["TenSP"].ToString(),
                         DonGia = Convert.ToDecimal(rd["DonGia"]),
-                        SoLuongTon = soLuong,
-                        HinhAnh = rd["HinhAnh"].ToString()
+                        SoLuongTon = tonKho,  // tồn kho thực tế trong DB
+                        HinhAnh = rd["HinhAnh"].ToString(),
+
+                        // số lượng khách muốn mua
+                        SoLuongMua = soLuong
                     };
 
                     cart.Add(sp);
@@ -150,15 +154,16 @@ namespace WebBanVLXD.Controllers
                 tonKho = (int)cmd.ExecuteScalar();
             }
 
-            // Nếu số lượng muốn mua > tồn kho → báo lỗi
+            // Nếu số lượng muốn mua > tồn kho
             if (soLuong > tonKho)
             {
                 TempData["Loi"] = $"❌ Không đủ hàng! Tồn kho chỉ còn {tonKho}.";
                 return RedirectToAction("GioHang");
             }
 
-            // Ngược lại: cập nhật số lượng
-            sp.SoLuongTon = soLuong;
+            // ✅ đúng: cập nhật số lượng khách mua
+            sp.SoLuongMua = soLuong;
+
             Session["Cart"] = cart;
 
             TempData["ThongBao"] = "✔ Cập nhật giỏ hàng thành công!";
@@ -173,8 +178,7 @@ namespace WebBanVLXD.Controllers
             var cart = Session["Cart"] as List<SANPHAM>;
             if (cart == null || !cart.Any())
                 return RedirectToAction("Index", "SanPham");
-
-            ViewBag.TongTien = cart.Sum(x => x.DonGia * x.SoLuongTon);
+            ViewBag.TongTien = cart.Sum(x => x.DonGia * x.SoLuongMua);
             return View(cart);
         }
 
@@ -205,7 +209,7 @@ namespace WebBanVLXD.Controllers
                         INSERT INTO HOADON (NgayLap, TongTien, TrangThai, PhuongThucTT, MaKH, MaQL)
                         VALUES (GETDATE(), @tong, N'Đã thanh toán', @pt, @maKH, 'US002')";
                     SqlCommand cmdHD = new SqlCommand(sqlHD, conn, tran);
-                    cmdHD.Parameters.AddWithValue("@tong", cart.Sum(x => x.DonGia * x.SoLuongTon));
+                    cmdHD.Parameters.AddWithValue("@tong", cart.Sum(x => x.DonGia * x.SoLuongMua));
                     cmdHD.Parameters.AddWithValue("@pt", phuongThuc ?? "Tiền mặt");
                     cmdHD.Parameters.AddWithValue("@maKH", maKH);
                     cmdHD.ExecuteNonQuery();
@@ -215,21 +219,24 @@ namespace WebBanVLXD.Controllers
                     SqlCommand cmdGet = new SqlCommand("SELECT TOP 1 MaHD FROM HOADON ORDER BY MaHD DESC", conn, tran);
                     maHD = cmdGet.ExecuteScalar().ToString();
 
-                    // 3️⃣ Thêm chi tiết hóa đơn & trừ tồn kho
                     foreach (var sp in cart)
                     {
                         SqlCommand cmdCT = new SqlCommand("INSERT INTO CTHOADON VALUES (@maHD,@maSP,@sl,@dg)", conn, tran);
                         cmdCT.Parameters.AddWithValue("@maHD", maHD);
                         cmdCT.Parameters.AddWithValue("@maSP", sp.MaSP);
-                        cmdCT.Parameters.AddWithValue("@sl", sp.SoLuongTon);
+                        cmdCT.Parameters.AddWithValue("@sl", sp.SoLuongMua);   // ✔ đúng
                         cmdCT.Parameters.AddWithValue("@dg", sp.DonGia);
                         cmdCT.ExecuteNonQuery();
 
-                        SqlCommand cmdUpd = new SqlCommand("UPDATE SANPHAM SET SoLuongTon = SoLuongTon - @sl WHERE MaSP=@maSP", conn, tran);
-                        cmdUpd.Parameters.AddWithValue("@sl", sp.SoLuongTon);
+                        SqlCommand cmdUpd = new SqlCommand(
+                            "UPDATE SANPHAM SET SoLuongTon = SoLuongTon - @sl WHERE MaSP=@maSP",
+                            conn, tran);
+
+                        cmdUpd.Parameters.AddWithValue("@sl", sp.SoLuongMua);   // ✔ đúng
                         cmdUpd.Parameters.AddWithValue("@maSP", sp.MaSP);
                         cmdUpd.ExecuteNonQuery();
                     }
+
 
                     tran.Commit();
                     Session["Cart"] = null;

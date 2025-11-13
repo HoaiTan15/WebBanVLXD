@@ -16,5 +16,9 @@ namespace WebBanVLXD.Models
         public string MoTa { get; set; }
         public string MaNCC { get; set; }
         public string MaDM { get; set; }
+        public int SoLuongMua { get; set; }
+        public string TenNCC { get; set; }
+        public string TenDM { get; set; }
+
     }
 }
