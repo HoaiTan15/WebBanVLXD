@@ -1,0 +1,56 @@
+﻿@model List<WebBanVLXD.Models.NGUOIDUNG>
+@{
+    ViewBag.Title = "Phân quyền người dùng";
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+}
+
+<div class="container mt-4">
+    <h3 class="text-primary mb-3"><i class="fa fa-users-gear"></i> PHÂN QUYỀN NGƯỜI DÙNG</h3>
+
+    @if (TempData["ThongBao"] != null)
+    {
+        <div class="alert alert-success">@TempData["ThongBao"]</div>
+    }
+
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-dark text-center">
+            <tr>
+                <th>Mã</th>
+                <th>Tên người dùng</th>
+                <th>Email</th>
+                <th>Số điện thoại</th>
+                <th>Vai trò</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Model)
+            {
+                <tr>
+                    <td>@u.MaUser</td>
+                    <td>@u.TenNguoiDung</td>
+                    <td>@u.Email</td>
+                    <td>@u.SDT</td>
+                    <td>
+                        <form method="post" action="@Url.Action("CapNhatQuyen", "Admin")" class="d-flex justify-content-center">
+                            <input type="hidden" name="maUser" value="@u.MaUser" />
+                            <select name="role" class="form-select form-select-sm me-2" style="width:120px">
+                                <option value="admin" @(u.Role == "admin" ? "selected" : "")>Admin</option>
+                                <option value="quanly" @(u.Role == "quanly" ? "selected" : "")>Quản lý</option>
+                                <option value="khach" @(u.Role == "khach" ? "selected" : "")>Khách</option>
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-success">
+                                <i class="fa fa-save"></i>
+                            </button>
+                        </form>
+                    </td>
+                    <td>@u.TrangThai</td>
+                    <td class="text-center">
+                        <a href="#" class="btn btn-danger btn-sm"><i class="fa fa-ban"></i> Khóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

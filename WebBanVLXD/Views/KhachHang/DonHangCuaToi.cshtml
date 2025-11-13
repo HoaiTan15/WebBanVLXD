@@ -1,0 +1,40 @@
+﻿@model List<WebBanVLXD.Models.HOADON>
+@{
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Title = "Đơn hàng của tôi";
+}
+
+<div class="container mt-5">
+    <h4 class="fw-bold text-center mb-4">Lịch sử đơn hàng</h4>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">Bạn chưa có đơn hàng nào.</div>
+    }
+    else
+    {
+        <table class="table table-bordered text-center align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Mã hóa đơn</th>
+                    <th>Ngày lập</th>
+                    <th>Tổng tiền</th>
+                    <th>Phương thức TT</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var hd in Model)
+                {
+                    <tr>
+                        <td>@hd.MaHD</td>
+                        <td>@hd.NgayLap.ToString("dd/MM/yyyy")</td>
+                        <td class="text-danger fw-bold">@string.Format("{0:N0} đ", hd.TongTien)</td>
+                        <td>@hd.PhuongThucTT</td>
+                        <td>@hd.TrangThai</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

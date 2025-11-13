@@ -1,0 +1,38 @@
+﻿@model IEnumerable<WebBanVLXD.Models.BaoCaoDoanhThu>
+@{
+    ViewBag.Title = "Báo cáo doanh thu";
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+}
+
+<div class="container mt-4">
+    <h3 class="text-primary"><i class="fa fa-line-chart"></i> Báo cáo doanh thu</h3>
+    <hr />
+
+    <table class="table table-bordered table-hover text-center align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Ngày</th>
+                <th>Doanh thu bán hàng</th>
+                <th>Chi phí nhập hàng</th>
+                <th>Lợi nhuận</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var bc in Model)
+            {
+                <tr>
+                    <td>@bc.Ngay.ToString("dd-MM-yyyy")</td>
+                    <td>@string.Format("{0:N0} ₫", bc.TongBan)</td>
+                    <td>@string.Format("{0:N0} ₫", bc.TongNhap)</td>
+                    <td class="fw-bold text-success">@string.Format("{0:N0} ₫", bc.LoiNhuan)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="text-end">
+        <a href="@Url.Action("Index", "SanPham")" class="btn btn-secondary">
+            <i class="fa fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+</div>

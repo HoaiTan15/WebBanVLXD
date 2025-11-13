@@ -1,0 +1,48 @@
+﻿/* ==== DANH MỤC SẢN PHẨM ==== */
+.category-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid #eee;
+}
+
+    .category-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+
+.category-img {
+    width: 130px;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 50%;
+    transition: 0.3s ease;
+}
+
+.category-name {
+    font-weight: 600;
+    font-size: 16px;
+    color: #222;
+}
+
+/* ==== RESPONSIVE ==== */
+@media (max-width: 768px) {
+    .category-img {
+        width: 100px;
+        height: 100px;
+    }
+
+    .category-name {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 576px) {
+    .category-img {
+        width: 80px;
+        height: 80px;
+    }
+
+    .category-name {
+        font-size: 13px;
+    }
+}

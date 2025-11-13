@@ -1,10 +1,135 @@
-﻿@model IEnumerable<WebBanVLXD.Models.SANPHAM>
-
-
+﻿@model List<WebBanVLXD.Models.SANPHAM>
 @{
-    ViewBag.Title = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Title = "Sản phẩm";
+    var danhMucs = ViewBag.DanhMuc as List<WebBanVLXD.Models.DANHMUC>;
+}
+<link href="~/css/Danhmuc.css" rel="stylesheet" />
+
+<!-- DANH MỤC -->
+<div class="container mt-4">
+    <h5 class="fw-bold mb-3 text-uppercase text-center">Danh mục</h5>
+    <div class="row row-cols-2 row-cols-md-4 g-4 justify-content-center">
+        @foreach (var dm in danhMucs)
+        {
+            <div class="col text-center">
+                <a href="@Url.Action("Index", "SanPham", new { madm = dm.MaDM })" class="text-decoration-none text-dark">
+                    <div class="category-card p-3 border rounded-3 bg-white hover-shadow-sm">
+                        <img src="~/@dm.HinhAnh" alt="@dm.TenDM" class="category-img" />
+                        <div class="category-name mt-2">@dm.TenDM</div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- ========================== PHẦN DÀNH CHO ADMIN ========================== -->
+@if (ViewBag.IsAdmin == true)
+{
+    <div class="container mt-4 mb-4">
+        <div class="alert alert-primary shadow-sm">
+            <h4 class="mb-3">
+                <i class="fa fa-gear"></i> Bảng điều khiển quản trị
+            </h4>
+
+            <div class="d-flex flex-wrap gap-2">
+                <!-- Quản lý tài khoản -->
+                <a href="@Url.Action("QLTaiKhoan", "Admin")" class="btn btn-info">
+                    <i class="fa fa-users"></i> Quản lý tài khoản
+                </a>
+
+                <!-- Quản lý sản phẩm -->
+                <a href="@Url.Action("QLSanPham", "Admin")" class="btn btn-success">
+                    <i class="fa fa-box"></i> Quản lý sản phẩm
+                </a>
+
+                <!-- Phân quyền -->
+                <a href="@Url.Action("PhanQuyen", "Admin")" class="btn btn-warning text-dark">
+                    <i class="fa fa-user-shield"></i> Phân quyền người dùng
+                </a>
+
+                <!-- Thống kê -->
+                <a href="@Url.Action("ThongKe", "Admin")" class="btn btn-secondary">
+                    <i class="fa fa-chart-line"></i> Thống kê hệ thống
+                </a>
+            </div>
+        </div>
+    </div>
 }
 
-<h2>Index</h2>
+<!-- ========================== PHẦN DÀNH CHO QUẢN LÝ ========================== -->
+@if (Session["Role"] != null && Session["Role"].ToString() == "quanly")
+{
+    <div class="container mt-4 mb-4">
+        <div class="alert alert-success shadow-sm">
+            <h4 class="mb-3">
+                <i class="fa fa-briefcase"></i> Bảng điều khiển quản lý
+            </h4>
 
+            <div class="d-flex flex-wrap gap-2">
+                <!-- Quản lý sản phẩm -->
+                <a href="@Url.Action("QLSanPham", "Quanly")" class="btn btn-primary">
+                    <i class="fa fa-box"></i> Quản lý sản phẩm
+                </a>
+
+                <!-- Quản lý nhập hàng -->
+                <a href="@Url.Action("QLNhapHang", "Quanly")" class="btn btn-success">
+                    <i class="fa fa-download"></i> Quản lý nhập hàng
+                </a>
+
+
+
+                <!-- Quản lý tồn kho -->
+                <a href="@Url.Action("QLTonKho", "Quanly")" class="btn btn-info text-white">
+                    <i class="fa fa-cubes"></i> Quản lý tồn kho
+                </a>
+
+                <!-- Báo cáo -->
+                <a href="@Url.Action("BaoCaoDoanhThu", "Quanly")" class="btn btn-danger">
+                    <i class="fa fa-bar-chart"></i> Báo cáo doanh thu
+                </a>
+
+
+                <!-- Quản lý đơn hàng -->
+                <a href="@Url.Action("QLDonHang", "QuanLy")" class="btn btn-primary btn-lg">
+                    <i class="fa fa-box"></i> Quản lý đơn hàng
+                </a>
+
+            </div>
+        </div>
+    </div>
+}
+
+
+
+
+<!-- DANH SÁCH SẢN PHẨM -->
+<div class="container mt-5">
+    <h5 class="fw-bold mb-3 text-uppercase">Sản phẩm</h5>
+    <div class="row row-cols-2 row-cols-md-4 g-4">
+        @foreach (var sp in Model)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0">
+                    <img src="~/@sp.HinhAnh" class="card-img-top" alt="@sp.TenSP" style="height:180px;object-fit:cover;">
+                    <div class="card-body">
+                        <h6 class="card-title text-truncate">@sp.TenSP</h6>
+                        <p class="text-danger fw-bold">@string.Format("{0:N0} đ", sp.DonGia)</p>
+                        <a href="@Url.Action("ChiTiet", "SanPham", new {id=sp.MaSP.Trim()})" class="btn btn-outline-danger btn-sm w-100">
+                            Xem chi tiết
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .hover-shadow-sm:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+        transition: all .2s ease;
+    }
+</style>

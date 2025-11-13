@@ -1,0 +1,39 @@
+﻿@model WebBanVLXD.Models.NGUOIDUNG
+@{
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Title = "Thông tin tài khoản";
+}
+
+<div class="container my-4">
+    <div class="card shadow-sm p-4">
+        <h4 class="mb-3 text-primary">
+            <i class="fa-solid fa-user-circle me-2"></i> Thông tin tài khoản
+        </h4>
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Mã người dùng:</dt>
+            <dd class="col-sm-9">@Model.MaUser</dd>
+
+            <dt class="col-sm-3">Họ tên:</dt>
+            <dd class="col-sm-9">@Model.TenNguoiDung</dd>
+
+            <dt class="col-sm-3">Email:</dt>
+            <dd class="col-sm-9">@Model.Email</dd>
+
+            <dt class="col-sm-3">Số điện thoại:</dt>
+            <dd class="col-sm-9">@Model.SDT</dd>
+
+            <dt class="col-sm-3">Địa chỉ:</dt>
+            <dd class="col-sm-9">@Model.DiaChi</dd>
+
+            <dt class="col-sm-3">Vai trò:</dt>
+            <dd class="col-sm-9 text-capitalize">@Model.Role</dd>
+        </dl>
+
+        <div class="mt-4 text-end">
+            <a href="@Url.Action("SuaThongTin", "Account")" class="btn btn-primary me-2">
+                <i class="fa-solid fa-pen-to-square me-1"></i> Chỉnh sửa
+            </a>
+            <a href="@Url.Action("Index","SanPham")" class="btn btn-outline-secondary">Quay lại</a>
+        </div>
+    </div>
+</div>

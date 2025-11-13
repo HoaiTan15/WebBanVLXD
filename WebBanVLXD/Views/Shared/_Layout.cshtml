@@ -1,7 +1,6 @@
 ﻿@{
     var userName = Session["UserName"] != null ? Session["UserName"].ToString() : "Khách";
-    // Nếu chưa đăng nhập thì mặc định role = "khach"
-    var role = Session["Role"] != null ? Session["Role"].ToString() : "khach";
+    var role = Session["Role"] != null ? Session["Role"].ToString() : "khach"; // Mặc định là khách
 }
 <!DOCTYPE html>
 <html lang="vi">
@@ -211,7 +210,7 @@
         </nav>
 
         <div class="logout-section">
-            @if (!string.IsNullOrEmpty(Session["UserID"]?.ToString()))
+            @if (Session["UserID"] != null && !string.IsNullOrEmpty(Session["UserID"].ToString()))
             {
                 <a href="@Url.Action("Logout", "Account")" class="d-flex align-items-center gap-2 text-danger text-decoration-none">
                     <i class="fas fa-power-off"></i>

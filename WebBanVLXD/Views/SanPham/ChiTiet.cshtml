@@ -1,0 +1,203 @@
+﻿@model WebBanVLXD.Models.SANPHAM
+@{
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Title = Model.TenSP;
+}
+<!-- BREADCRUMB -->
+<div class="container mt-3 mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-white px-3 py-2 rounded-3 shadow-sm">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "SanPham")" class="text-decoration-none text-primary">VLXD Store</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "SanPham", new { madm = ViewBag.MaDanhMuc })" class="text-decoration-none text-primary">
+                    @ViewBag.TenDanhMuc
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                @Model.TenSP
+            </li>
+        </ol>
+    </nav>
+</div>
+<div class="container my-4">
+    <div class="row g-4 bg-white p-4 shadow-sm rounded-3">
+
+        <!-- ẢNH SẢN PHẨM -->
+        <div class="col-md-5">
+            <img src="~/@Model.HinhAnh" alt="@Model.TenSP" class="img-fluid rounded-3 border" />
+            <div class="d-flex mt-3 gap-2">
+                <img src="~/@Model.HinhAnh" class="img-thumbnail" style="width:70px;height:70px;object-fit:cover;" />
+                <img src="~/@Model.HinhAnh" class="img-thumbnail" style="width:70px;height:70px;object-fit:cover;" />
+                <img src="~/@Model.HinhAnh" class="img-thumbnail" style="width:70px;height:70px;object-fit:cover;" />
+            </div>
+        </div>
+
+        <!-- THÔNG TIN SẢN PHẨM -->
+        <div class="col-md-7">
+            <h4 class="fw-bold">@Model.TenSP</h4>
+            <div class="text-warning mb-2">
+                ★★★★☆ <small class="text-muted">(1.2k đánh giá)</small>
+            </div>
+
+            <div class="bg-light p-3 rounded-3 mb-3">
+                <span class="fs-5 text-danger fw-bold">
+                    @string.Format("{0:N0} đ", Model.DonGia)
+                </span>
+                <span class="text-muted text-decoration-line-through ms-2">
+                    @string.Format("{0:N0} đ", Model.DonGia * 1.2M)
+                </span>
+                <span class="badge bg-danger ms-2">-20%</span>
+            </div>
+
+            <div class="mb-3">
+                <strong>Đơn vị tính:</strong> @Model.DonViTinh
+            </div>
+
+            <div class="mb-3">
+                <strong>Còn lại:</strong> @Model.SoLuongTon sản phẩm
+            </div>
+
+            <div class="mb-3">
+                <strong>Mô tả:</strong>
+                <p class="text-muted mt-2">@Model.MoTa</p>
+            </div>
+
+            <div class="d-flex align-items-center mb-4">
+                <label class="me-3 fw-semibold">Số lượng:</label>
+                <div class="input-group" style="width:130px;">
+                    <button class="btn btn-outline-secondary" type="button" id="minus">-</button>
+                    <input type="number" id="quantity" class="form-control text-center" value="1" min="1" />
+                    <button class="btn btn-outline-secondary" type="button" id="plus">+</button>
+                </div>
+            </div>
+
+            <div class="d-flex gap-3">
+                <form method="post" action="@Url.Action("ThemVaoGio", "KhachHang")">
+                    <input type="hidden" name="MaSP" value="@Model.MaSP" />
+                    <input type="hidden" name="SoLuong" id="HiddenQty" value="1" />
+
+                    <div class="d-flex align-items-center mb-4">
+                        <label class="me-3 fw-semibold">Số lượng:</label>
+                        <div class="input-group" style="width:130px;">
+                            <button type="button" class="btn btn-outline-secondary" id="minus">-</button>
+                            <input type="number" class="form-control text-center" id="quantity" value="1" min="1">
+                            <button type="button" class="btn btn-outline-secondary" id="plus">+</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-outline-danger px-4">
+                        <i class="fa fa-cart-plus"></i> Thêm vào giỏ hàng
+                    </button>
+                </form>
+                <script>
+                    const qtyInput = document.getElementById("quantity");
+                    const hiddenQty = document.getElementById("HiddenQty");
+                    const plusBtn = document.getElementById("plus");
+                    const minusBtn = document.getElementById("minus");
+
+                    plusBtn.addEventListener("click", () => {
+                        qtyInput.value = parseInt(qtyInput.value) + 1;
+                        hiddenQty.value = qtyInput.value;
+                    });
+
+                    minusBtn.addEventListener("click", () => {
+                        if (parseInt(qtyInput.value) > 1) {
+                            qtyInput.value = parseInt(qtyInput.value) - 1;
+                            hiddenQty.value = qtyInput.value;
+                        }
+                    });
+
+                    qtyInput.addEventListener("input", () => {
+                        hiddenQty.value = qtyInput.value;
+                    });
+                </script>
+
+
+                <button class="btn btn-danger px-4">
+                    Mua ngay
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS tăng giảm số lượng -->
+<script>
+    const minus = document.getElementById("minus");
+    const plus = document.getElementById("plus");
+    const qty = document.getElementById("quantity");
+    const hiddenQty = document.getElementById("hiddenQty");
+
+    minus.addEventListener("click", () => {
+        if (qty.value > 1) qty.value--;
+        hiddenQty.value = qty.value;
+    });
+
+    plus.addEventListener("click", () => {
+        qty.value++;
+        hiddenQty.value = qty.value;
+    });
+
+    qty.addEventListener("input", () => hiddenQty.value = qty.value);
+</script>
+
+<style>
+    .breadcrumb {
+        background: #f9f9f9;
+        border: 1px solid #eee;
+        font-size: 14px;
+    }
+
+        .breadcrumb a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+
+            .breadcrumb a:hover {
+                text-decoration: underline;
+            }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: ">";
+        color: #999;
+        margin: 0 6px;
+    }
+    body {
+        background: #f5f7fa;
+    }
+
+    .badge {
+        font-size: 0.85rem;
+    }
+
+    .img-thumbnail:hover {
+        border: 2px solid #ff5722;
+        transition: 0.2s;
+    }
+
+    .btn-danger {
+        background-color: #ff5722;
+        border: none;
+    }
+
+        .btn-danger:hover {
+            background-color: #e64a19;
+        }
+
+    .btn-outline-danger:hover {
+        background-color: #ffe4dc;
+    }
+    /* Ẩn mũi tên tăng/giảm trong input number */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield; /* cho Firefox */
+    }
+
+</style>

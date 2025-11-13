@@ -1,0 +1,58 @@
+﻿@model List<WebBanVLXD.Models.SANPHAM>
+@{
+    ViewBag.Title = "Quản lý tồn kho";
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+}
+
+<div class="container mt-4">
+    <h3 class="mb-3 text-primary">
+        <i class="fa fa-cubes"></i> Quản lý tồn kho
+    </h3>
+
+    <table class="table table-bordered table-hover text-center align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Mã SP</th>
+                <th>Tên sản phẩm</th>
+                <th>Đơn vị</th>
+                <th>Số lượng tồn</th>
+                <th>Trạng thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var sp in Model)
+            {
+                string trangThai;
+                string mau;
+
+                if (sp.SoLuongTon <= 5)
+                {
+                    trangThai = "Sắp hết hàng";
+                    mau = "text-danger fw-bold";
+                }
+                else if (sp.SoLuongTon <= 50)
+                {
+                    trangThai = "Còn ít";
+                    mau = "text-warning fw-bold";
+                }
+                else
+                {
+                    trangThai = "Còn nhiều";
+                    mau = "text-success fw-bold";
+                }
+
+                <tr>
+                    <td>@sp.MaSP</td>
+                    <td>@sp.TenSP</td>
+                    <td>@sp.DonViTinh</td>
+                    <td>@sp.SoLuongTon</td>
+                    <td class="@mau">@trangThai</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a href="@Url.Action("Index", "SanPham")" class="btn btn-secondary mt-3">
+        <i class="fa fa-arrow-left"></i> Quay lại trang quản lý
+    </a>
+</div>

@@ -1,0 +1,49 @@
+﻿@{
+    ViewBag.Title = "Thống kê hệ thống";
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+}
+
+<div class="container mt-4">
+    <h3 class="text-primary mb-4"><i class="fa fa-chart-line"></i> THỐNG KÊ HỆ THỐNG</h3>
+
+    <div class="row text-center">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info text-white shadow">
+                <div class="card-body">
+                    <h4>@ViewBag.TongNguoiDung</h4>
+                    <p>Người dùng</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white shadow">
+                <div class="card-body">
+                    <h4>@ViewBag.TongSanPham</h4>
+                    <p>Sản phẩm</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-dark shadow">
+                <div class="card-body">
+                    <h4>@ViewBag.TongDonHang</h4>
+                    <p>Đơn hàng</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card bg-danger text-white shadow">
+                <div class="card-body">
+                    <h4>@String.Format("{0:N0} đ", ViewBag.DoanhThu)</h4>
+                    <p>Doanh thu</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+    <p class="text-muted text-center">Dữ liệu được tổng hợp từ hệ thống VLXD Store.</p>
+</div>

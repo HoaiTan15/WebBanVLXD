@@ -1,0 +1,105 @@
+﻿@model IEnumerable<WebBanVLXD.Models.SANPHAM>
+@{
+    ViewBag.Title = "Quản lý sản phẩm";
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+}
+
+<div class="container mt-4">
+    <h3 class="mb-4 text-primary"><i class="fa fa-box"></i> Quản lý sản phẩm</h3>
+
+    <!-- THÔNG BÁO -->
+    @if (TempData["ThongBao"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa fa-check-circle"></i> @TempData["ThongBao"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- FORM THÊM SẢN PHẨM -->
+    <form action="@Url.Action("ThemSanPham", "QuanLy")" method="post" class="row g-2 mb-4 border p-3 rounded shadow-sm">
+        <div class="col-md-3">
+            <input type="text" name="ten" class="form-control" placeholder="Tên sản phẩm" required />
+        </div>
+        <div class="col-md-2">
+            <input type="number" step="1000" name="dongia" class="form-control" placeholder="Đơn giá" required />
+        </div>
+        <div class="col-md-2">
+            <input type="text" name="dvt" class="form-control" placeholder="Đơn vị tính" required />
+        </div>
+        <div class="col-md-1">
+            <input type="number" name="sl" class="form-control" placeholder="SL" required />
+        </div>
+        <div class="col-md-4">
+            <input type="text" name="mota" class="form-control" placeholder="Mô tả" />
+        </div>
+        <div class="col-md-3">
+            <input type="text" name="mancc" class="form-control" placeholder="Mã NCC" />
+        </div>
+        <div class="col-md-3">
+            <input type="text" name="madm" class="form-control" placeholder="Mã DM" />
+        </div>
+        <div class="col-md-3">
+            <input type="file" name="hinhanh" class="form-control" />
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-success w-100">
+                <i class="fa fa-plus"></i> Thêm
+            </button>
+        </div>
+    </form>
+
+    <!-- DANH SÁCH SẢN PHẨM -->
+    <table class="table table-bordered table-hover shadow-sm align-middle">
+        <thead class="table-light text-center">
+            <tr>
+                <th style="width: 6%">Mã</th>
+                <th style="width: 20%">Tên sản phẩm</th>
+                <th style="width: 10%">Đơn giá</th>
+                <th style="width: 8%">Tồn kho</th>
+                <th style="width: 10%">Hình ảnh</th>
+                <th style="width: 28%">Mô tả</th>
+                <th style="width: 18%">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var sp in Model)
+            {
+                <tr>
+                    <form action="@Url.Action("CapNhatSanPham", "QuanLy")" method="post">
+                    <td class="text-center">
+                        <input type="hidden" name="ma" value="@sp.MaSP" />
+                        <strong>@sp.MaSP</strong>
+                    </td>
+                    <td>
+                        <input type="text" name="ten" value="@sp.TenSP" class="form-control form-control-sm" />
+                    </td>
+                    <td>
+                        <input type="number" step="1000" name="dongia" value="@sp.DonGia" class="form-control form-control-sm" />
+                    </td>
+                    <td>
+                        <input type="number" name="sl" value="@sp.SoLuongTon" class="form-control form-control-sm" />
+                    </td>
+                    <td class="text-center">
+                        <img src="~/@sp.HinhAnh" width="60" height="60" class="rounded border" />
+                    </td>
+                    <td>@sp.MoTa</td>
+                    <td class="text-center">
+                        <button type="submit" class="btn btn-sm btn-primary mb-1 w-100">
+                            <i class="fa fa-save"></i> Cập nhật
+                        </button>
+
+                        <form action="@Url.Action("XoaSanPham", "QuanLy")" method="post" style="display:inline">
+                            <input type="hidden" name="ma" value="@sp.MaSP" />
+                            <button type="submit" class="btn btn-sm btn-danger w-100"
+                                    onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này không?')">
+                                <i class="fa fa-trash"></i> Xóa
+                            </button>
+                        </form>
+                    </td>
+                    </form>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

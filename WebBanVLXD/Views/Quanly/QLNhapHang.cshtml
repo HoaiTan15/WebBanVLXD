@@ -1,0 +1,50 @@
+﻿@model IEnumerable<WebBanVLXD.Models.HOADONNHAPHANG>
+@{
+    ViewBag.Title = "Quản lý nhập hàng";
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+}
+
+<div class="container mt-4">
+    <h3 class="mb-3 text-primary"><i class="fa fa-truck-loading"></i> Quản lý nhập hàng</h3>
+
+    @if (TempData["ThongBao"] != null)
+    {
+        <div class="alert alert-success">@TempData["ThongBao"]</div>
+    }
+
+    <form action="@Url.Action("TaoPhieuNhap", "Quanly")" method="post" class="d-flex gap-2 mb-4">
+        <input type="text" name="mancc" class="form-control w-25" placeholder="Nhập mã nhà cung cấp..." required />
+        <button type="submit" class="btn btn-success"><i class="fa fa-plus"></i> Tạo phiếu nhập</button>
+    </form>
+
+    <table class="table table-bordered table-hover text-center align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Mã phiếu</th>
+                <th>Ngày nhập</th>
+                <th>Tổng tiền</th>
+                <th>Nhà cung cấp</th>
+                <th>Người nhập</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td>@p.MaHDN</td>
+                    <td>@p.NgayNhap.ToString("dd/MM/yyyy")</td>
+                    <td>@string.Format("{0:N0} đ", p.TongTien)</td>
+                    <td>@p.MaNCC</td>
+                    <td>@p.MaQL</td>
+                    <td>
+                        <a href="@Url.Action("ChiTietPhieuNhap", "QuanLy", new { id = p.MaHDN.Trim() })" class="btn btn-sm btn-info">
+
+                            <i class="fa fa-eye"></i> Xem chi tiết
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

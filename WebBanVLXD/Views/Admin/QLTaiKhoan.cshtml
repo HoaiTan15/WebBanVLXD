@@ -1,0 +1,113 @@
+﻿@model List<WebBanVLXD.Models.NGUOIDUNG>
+@{
+    ViewBag.Title = "Quản lý tài khoản";
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+}
+
+<div class="container mt-4 mb-5">
+    <h3 class="fw-bold text-primary mb-3">
+        <i class="fa fa-users"></i> Danh sách tài khoản
+    </h3>
+
+    <!-- Form thêm tài khoản -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title text-success mb-3"><i class="fa fa-plus-circle"></i> Thêm tài khoản mới</h5>
+
+            <form method="post" action="@Url.Action("ThemTaiKhoan", "Admin")" class="row g-3">
+                <div class="col-md-2">
+                    <input name="ma" class="form-control" placeholder="Mã user" required />
+                </div>
+                <div class="col-md-2">
+                    <input name="ten" class="form-control" placeholder="Tên người dùng" required />
+                </div>
+                <div class="col-md-2">
+                    <input name="email" type="email" class="form-control" placeholder="Email" required />
+                </div>
+                <div class="col-md-2">
+                    <input name="matkhau" type="password" class="form-control" placeholder="Mật khẩu" required />
+                </div>
+                <div class="col-md-2">
+                    <input name="sdt" class="form-control" placeholder="SĐT" />
+                </div>
+                <div class="col-md-2">
+                    <input name="diachi" class="form-control" placeholder="Địa chỉ" />
+                </div>
+                <div class="col-md-2">
+                    <select name="role" class="form-select">
+                        <option value="khach">Khách</option>
+                        <option value="quanly">Quản lý</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fa fa-plus"></i> Thêm
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Danh sách tài khoản -->
+    <table class="table table-bordered table-hover align-middle shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>Mã</th>
+                <th>Họ tên</th>
+                <th>Email</th>
+                <th>SĐT</th>
+                <th>Địa chỉ</th>
+                <th>Vai trò</th>
+                <th>Trạng thái</th>
+                <th>Ngày tạo</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Model)
+            {
+                <tr>
+                    <td>@u.MaUser</td>
+                    <td>@u.TenNguoiDung</td>
+                    <td>@u.Email</td>
+                    <td>@u.SDT</td>
+                    <td>@u.DiaChi</td>
+                    <td>
+                        @if (u.Role == "admin")
+                        {
+                            <span class="badge bg-danger">Admin</span>
+                        }
+                        else if (u.Role == "quanly")
+                        {
+                            <span class="badge bg-info text-dark">Quản lý</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Khách</span>
+                        }
+                    </td>
+                    <td>
+                        @if (u.TrangThai == "HoatDong")
+                        {
+                            <span class="text-success fw-bold">Hoạt động</span>
+                        }
+                        else
+                        {
+                            <span class="text-danger fw-bold">Bị khóa</span>
+                        }
+                    </td>
+                    <td>@u.NgayTao.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <form method="post" action="@Url.Action("XoaTaiKhoan", "Admin")" style="display:inline;">
+                            <input type="hidden" name="ma" value="@u.MaUser" />
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Xóa tài khoản này?')">
+                                <i class="fa fa-trash"></i> Xóa
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

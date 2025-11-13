@@ -97,7 +97,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\Site.css" />
+    <Content Include="css\Danhmuc.css" />
     <Content Include="Global.asax" />
+    <Content Include="imagesSanPham\dm_gach.jpg" />
+    <Content Include="imagesSanPham\dm_son.jpg" />
+    <Content Include="imagesSanPham\dm_thep.jpg" />
+    <Content Include="imagesSanPham\dm_ximang.jpg" />
     <Content Include="imagesSanPham\gach1.jpg" />
     <Content Include="imagesSanPham\gach2.jpg" />
     <Content Include="imagesSanPham\gach3.jpg" />
@@ -123,37 +128,53 @@
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\KhachHangController.cs" />
+    <Compile Include="Controllers\QuanlyController.cs" />
     <Compile Include="Controllers\SanPhamController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\BaoCaoDoanhThu.cs" />
+    <Compile Include="Models\CTHOADON.cs" />
+    <Compile Include="Models\DANHMUC.cs" />
+    <Compile Include="Models\HOADON.cs" />
+    <Compile Include="Models\HOADONNHAPHANG.cs" />
+    <Compile Include="Models\NGUOIDUNG.cs" />
+    <Compile Include="Models\NHACUNGCAP.cs" />
+    <Compile Include="Models\PHIEUNHAP.cs" />
     <Compile Include="Models\QuenMatKhau.cs" />
-    <Compile Include="Models\VLXD_DB.designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>VLXD_DB.dbml</DependentUpon>
-    </Compile>
+    <Compile Include="Models\SANPHAM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\web.config" />
-    <Content Include="Models\VLXD_DB.dbml">
-      <Generator>MSLinqToSQLGenerator</Generator>
-      <LastGenOutput>VLXD_DB.designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </Content>
-    <None Include="Models\VLXD_DB.dbml.layout">
-      <DependentUpon>VLXD_DB.dbml</DependentUpon>
-    </None>
     <None Include="packages.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\TrangChu.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Account\ForgotPassword.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Account\ResetPassword.cshtml" />
+    <Content Include="Views\Shared\_LayoutShop.cshtml" />
     <Content Include="Views\SanPham\Index.cshtml" />
+    <Content Include="Views\SanPham\ChiTiet.cshtml" />
+    <Content Include="Views\Account\ThongTin.cshtml" />
+    <Content Include="Views\Admin\QLTaiKhoan.cshtml" />
+    <Content Include="Views\Admin\QLSanPham.cshtml" />
+    <Content Include="Views\Admin\PhanQuyen.cshtml" />
+    <Content Include="Views\Admin\ThongKe.cshtml" />
+    <Content Include="Views\Quanly\QLSanPham.cshtml" />
+    <Content Include="Views\Quanly\QLNhapHang.cshtml" />
+    <Content Include="Views\Quanly\ChiTietPhieuNhap.cshtml" />
+    <Content Include="Views\Quanly\QLTonKho.cshtml" />
+    <Content Include="Views\Quanly\BaoCaoDoanhThu.cshtml" />
+    <Content Include="Views\KhachHang\GioHang.cshtml" />
+    <Content Include="Views\KhachHang\DatHang.cshtml" />
+    <Content Include="Views\KhachHang\DonHangCuaToi.cshtml" />
+    <Content Include="Views\KhachHang\LichSuMuaHang.cshtml" />
+    <Content Include="Views\KhachHang\ChiTietHoaDon.cshtml" />
+    <Content Include="Views\Quanly\QLDonHang.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -166,6 +187,7 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
+    <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <PropertyGroup>

@@ -1,0 +1,98 @@
+﻿@model List<WebBanVLXD.Models.SANPHAM>
+@{
+    ViewBag.Title = "Quản lý sản phẩm";
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+}
+
+<div class="container mt-4 mb-5">
+    <h3 class="fw-bold text-primary mb-3">
+        <i class="fa fa-cubes"></i> Danh sách sản phẩm
+    </h3>
+
+    <!-- Form thêm sản phẩm -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title text-success mb-3"><i class="fa fa-plus-circle"></i> Thêm sản phẩm mới</h5>
+
+            <form method="post" action="@Url.Action("ThemSanPham", "Admin")" class="row g-3">
+                <div class="col-md-2">
+                    <input name="ma" class="form-control" placeholder="Mã sản phẩm" required />
+                </div>
+                <div class="col-md-3">
+                    <input name="ten" class="form-control" placeholder="Tên sản phẩm" required />
+                </div>
+                <div class="col-md-2">
+                    <input name="dongia" type="number" class="form-control" placeholder="Đơn giá" required />
+                </div>
+                <div class="col-md-2">
+                    <input name="dvt" class="form-control" placeholder="Đơn vị tính" />
+                </div>
+                <div class="col-md-1">
+                    <input name="sl" type="number" class="form-control" placeholder="SL" />
+                </div>
+                <div class="col-md-2">
+                    <input type="file" name="uploadFile" class="form-control" accept="image/*" required />
+                </div>
+                <div class="col-md-12">
+                    <textarea name="mota" class="form-control" rows="2" placeholder="Mô tả"></textarea>
+                </div>
+                <div class="col-md-2">
+                    <input name="mancc" class="form-control" placeholder="Mã NCC" />
+                </div>
+                <div class="col-md-2">
+                    <input name="madm" class="form-control" placeholder="Mã DM" />
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fa fa-plus"></i> Thêm
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Danh sách sản phẩm -->
+    <table class="table table-bordered table-hover align-middle shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>Mã</th>
+                <th>Tên sản phẩm</th>
+                <th>Đơn giá</th>
+                <th>Đơn vị</th>
+                <th>Tồn kho</th>
+                <th>Hình ảnh</th>
+                <th>Mô tả</th>
+                <th>Nhà CC</th>
+                <th>Danh mục</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var sp in Model)
+            {
+                <tr>
+                    <td>@sp.MaSP</td>
+                    <td>@sp.TenSP</td>
+                    <td>@String.Format("{0:N0} đ", sp.DonGia)</td>
+                    <td>@sp.DonViTinh</td>
+                    <td>@sp.SoLuongTon</td>
+                    <td>
+                        <img src="@Url.Content("~/" + sp.HinhAnh)" alt="Ảnh" width="70" height="70" style="object-fit:cover;border-radius:8px;" />
+
+                    </td>
+                    <td>@sp.MoTa</td>
+                    <td>@sp.MaNCC</td>
+                    <td>@sp.MaDM</td>
+                    <td>
+                        <form method="post" action="@Url.Action("XoaSanPham", "Admin")" style="display:inline;">
+                            <input type="hidden" name="ma" value="@sp.MaSP" />
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Xóa sản phẩm này?')">
+                                <i class="fa fa-trash"></i> Xóa
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

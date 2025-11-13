@@ -1,0 +1,61 @@
+﻿@model IEnumerable<WebBanVLXD.Models.PHIEUNHAP>
+@{
+    ViewBag.Title = "Chi tiết phiếu nhập";
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+}
+
+<div class="container mt-4">
+    <h3 class="text-primary mb-3"><i class="fa fa-clipboard-list"></i> Chi tiết phiếu nhập @ViewBag.MaHDN</h3>
+
+    @if (TempData["ThongBao"] != null)
+    {
+        <div class="alert alert-success">@TempData["ThongBao"]</div>
+    }
+
+    <form action="@Url.Action("ThemChiTiet", "QuanLy")" method="post" class="row g-2 mb-4 border p-3 rounded">
+        <input type="hidden" name="mahdn" value="@ViewBag.MaHDN" />
+        <div class="col-md-3">
+            <input type="text" name="masp" class="form-control" placeholder="Mã sản phẩm" required />
+        </div>
+        <div class="col-md-2">
+            <input type="number" name="sl" class="form-control" placeholder="Số lượng" min="1" required />
+        </div>
+        <div class="col-md-3">
+            <input type="number" name="gianhap" class="form-control" placeholder="Đơn giá nhập" step="100" required />
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-success w-100"><i class="fa fa-plus"></i> Thêm</button>
+        </div>
+    </form>
+
+    <table class="table table-bordered table-hover align-middle text-center">
+        <thead class="table-light">
+            <tr>
+                <th>Mã sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Đơn giá nhập</th>
+                <th>Thành tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in Model)
+            {
+                <tr>
+                    <td>@c.MaSP</td>
+                    <td>@c.SoLuong</td>
+                    <td>@string.Format("{0:N0} đ", c.DonGiaNhap)</td>
+                    <td>@string.Format("{0:N0} đ", c.SoLuong * c.DonGiaNhap)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a href="@Url.Action("QLNhapHang", "Quanly")" class="btn btn-secondary mt-2">
+        <i class="fa fa-arrow-left"></i> Quay lại danh sách phiếu nhập
+    </a>
+    <a href="@Url.Action("CapNhatTongTien", "Quanly", new { id = ViewBag.MaHDN })"
+       class="btn btn-primary mt-2">
+        <i class="fa fa-refresh"></i> Cập nhật tổng tiền
+    </a>
+
+</div>

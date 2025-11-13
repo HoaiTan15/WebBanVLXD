@@ -1,0 +1,48 @@
+﻿@model List<WebBanVLXD.Models.SANPHAM>
+@{
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Title = "Xác nhận đơn hàng";
+    decimal tong = Model.Sum(x => x.DonGia * x.SoLuongTon);
+}
+
+<div class="container mt-5">
+    <h4 class="fw-bold text-center mb-4">Xác nhận đặt hàng</h4>
+
+    <table class="table table-striped text-center">
+        <thead>
+            <tr>
+                <th>Tên sản phẩm</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+                <th>Thành tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var sp in Model)
+            {
+                <tr>
+                    <td>@sp.TenSP</td>
+                    <td>@string.Format("{0:N0} đ", sp.DonGia)</td>
+                    <td>@sp.SoLuongTon</td>
+                    <td>@string.Format("{0:N0} đ", sp.DonGia * sp.SoLuongTon)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="text-end mb-4">
+        <h5>Tổng cộng: <strong class="text-danger">@string.Format("{0:N0} đ", tong)</strong></h5>
+    </div>
+
+    <form action="@Url.Action("XacNhanDatHang", "KhachHang")" method="post" class="text-center">
+        <label class="fw-bold">Phương thức thanh toán:</label>
+        <select name="phuongThuc" class="form-select w-50 d-inline-block mb-3">
+            <option>Tiền mặt</option>
+            <option>Chuyển khoản</option>
+        </select>
+
+        <button type="submit" class="btn btn-success btn-lg">
+            Xác nhận đặt hàng
+        </button>
+    </form>
+</div>

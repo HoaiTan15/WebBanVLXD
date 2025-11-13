@@ -1,0 +1,37 @@
+﻿@model List<WebBanVLXD.Models.HOADON>
+@{
+    ViewBag.Title = "Quản lý đơn hàng";
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+}
+
+<div class="container mt-4">
+    <h3 class="text-primary mb-4">
+        <i class="fa fa-box"></i> Danh sách đơn hàng
+    </h3>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Mã HĐ</th>
+                <th>Ngày lập</th>
+                <th>Tổng tiền</th>
+                <th>Phương thức</th>
+                <th>Trạng thái</th>
+                <th>Mã KH</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var hd in Model)
+            {
+                <tr>
+                    <td>@hd.MaHD</td>
+                    <td>@hd.NgayLap.ToString("dd/MM/yyyy")</td>
+                    <td>@String.Format("{0:N0} đ", hd.TongTien)</td>
+                    <td>@hd.PhuongThucTT</td>
+                    <td>@hd.TrangThai</td>
+                    <td>@hd.MaKH</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

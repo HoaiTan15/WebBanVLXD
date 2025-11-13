@@ -1,0 +1,56 @@
+﻿@model List<WebBanVLXD.Models.SANPHAM>
+@{
+    Layout = "~/Views/Shared/_LayoutShop.cshtml";
+    ViewBag.Title = "Giỏ hàng";
+    decimal tong = Model.Sum(x => x.DonGia * x.SoLuongTon);
+}
+
+<div class="container mt-5">
+    <h4 class="text-center fw-bold mb-4">🛒 Giỏ hàng của bạn</h4>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning text-center">Giỏ hàng hiện đang trống!</div>
+    }
+    else
+    {
+        <table class="table table-bordered align-middle text-center">
+            <thead class="table-light">
+                <tr>
+                    <th>Hình ảnh</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Giá</th>
+                    <th>Số lượng</th>
+                    <th>Thành tiền</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var sp in Model)
+                {
+                    <tr>
+                        <td><img src="~/@sp.HinhAnh" width="80" height="80" /></td>
+                        <td>@sp.TenSP</td>
+                        <td>@string.Format("{0:N0} đ", sp.DonGia)</td>
+                        <td>
+                            <form action="@Url.Action("CapNhatGio", "KhachHang")" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@sp.MaSP" />
+                                <input type="number" name="soLuong" value="@sp.SoLuongTon" min="1" class="form-control w-50 d-inline-block" />
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Cập nhật</button>
+                            </form>
+                        </td>
+                        <td>@string.Format("{0:N0} đ", sp.DonGia * sp.SoLuongTon)</td>
+                        <td>
+                            <a href="@Url.Action("XoaKhoiGio", "KhachHang", new { id = sp.MaSP })" class="btn btn-danger btn-sm">Xóa</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="text-end mt-3">
+            <h5>Tổng cộng: <strong class="text-danger">@string.Format("{0:N0} đ", tong)</strong></h5>
+            <a href="@Url.Action("DatHang", "KhachHang")" class="btn btn-success mt-3">Tiến hành đặt hàng</a>
+        </div>
+    }
+</div>
