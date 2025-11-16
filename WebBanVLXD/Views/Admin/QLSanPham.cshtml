@@ -55,7 +55,6 @@
     <table class="table table-bordered table-hover align-middle shadow-sm">
         <thead class="table-dark">
             <tr>
-                <th>Mã</th>
                 <th>Tên sản phẩm</th>
                 <th>Đơn giá</th>
                 <th>Đơn vị</th>
@@ -71,7 +70,6 @@
             @foreach (var sp in Model)
             {
                 <tr>
-                    <td>@sp.MaSP</td>
                     <td>@sp.TenSP</td>
                     <td>@String.Format("{0:N0} đ", sp.DonGia)</td>
                     <td>@sp.DonViTinh</td>
@@ -81,15 +79,22 @@
 
                     </td>
                     <td>@sp.MoTa</td>
-                    <td>@sp.MaNCC</td>
-                    <td>@sp.MaDM</td>
-                    <td>
-                        <form method="post" action="@Url.Action("XoaSanPham", "Admin")" style="display:inline;">
+                    <td>@sp.TenNCC</td>
+                    <td>@sp.TenDM</td>
+                    <td class="d-flex gap-2">
+
+                        <a href="@Url.Action("SuaSanPham", "Admin", new { id = sp.MaSP.Trim() })"
+                           class="btn btn-warning btn-sm">
+                            <i class="fa fa-edit"></i> Sửa
+                        </a>
+
+                        <form method="post" action="@Url.Action("XoaSanPham","Admin")">
                             <input type="hidden" name="ma" value="@sp.MaSP" />
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Xóa sản phẩm này?')">
+                            <button class="btn btn-danger btn-sm">
                                 <i class="fa fa-trash"></i> Xóa
                             </button>
                         </form>
+
                     </td>
                 </tr>
             }

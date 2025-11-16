@@ -37,19 +37,12 @@
         <!-- THÔNG TIN SẢN PHẨM -->
         <div class="col-md-7">
             <h4 class="fw-bold">@Model.TenSP</h4>
-            <div class="text-warning mb-2">
-                ★★★★☆ <small class="text-muted">(1.2k đánh giá)</small>
-            </div>
-
             <div class="bg-light p-3 rounded-3 mb-3">
-                <span class="fs-5 text-danger fw-bold">
+                <span class="fs-4 text-danger fw-bold">
                     @string.Format("{0:N0} đ", Model.DonGia)
                 </span>
-                <span class="text-muted text-decoration-line-through ms-2">
-                    @string.Format("{0:N0} đ", Model.DonGia * 1.2M)
-                </span>
-                <span class="badge bg-danger ms-2">-20%</span>
             </div>
+
 
             <div class="mb-3">
                 <strong>Đơn vị tính:</strong> @Model.DonViTinh
@@ -78,14 +71,6 @@
                     <input type="hidden" name="MaSP" value="@Model.MaSP" />
                     <input type="hidden" name="SoLuong" id="HiddenQty" value="1" />
 
-                    <div class="d-flex align-items-center mb-4">
-                        <label class="me-3 fw-semibold">Số lượng:</label>
-                        <div class="input-group" style="width:130px;">
-                            <button type="button" class="btn btn-outline-secondary" id="minus">-</button>
-                            <input type="number" class="form-control text-center" id="quantity" value="1" min="1">
-                            <button type="button" class="btn btn-outline-secondary" id="plus">+</button>
-                        </div>
-                    </div>
 
                     <button type="submit" class="btn btn-outline-danger px-4">
                         <i class="fa fa-cart-plus"></i> Thêm vào giỏ hàng

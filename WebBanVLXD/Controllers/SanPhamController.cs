@@ -12,7 +12,7 @@ namespace WebBanVLXD.Controllers
         private readonly string connStr = ConfigurationManager.ConnectionStrings["VLXD_DBConnectionString"].ConnectionString;
 
         // ----------------- DANH SÁCH SẢN PHẨM -----------------
-        public ActionResult Index(string keyword, string madm)
+        public ActionResult Index(string keyword, string madm, string sort)
         {
             List<SANPHAM> sanPhams = new List<SANPHAM>();
             List<DANHMUC> danhMucs = new List<DANHMUC>();
@@ -44,6 +44,14 @@ namespace WebBanVLXD.Controllers
                     sql += " AND TenSP LIKE @keyword";
                 if (!string.IsNullOrEmpty(madm))
                     sql += " AND MaDM = @madm";
+
+                if (!string.IsNullOrEmpty(sort))
+                {
+                    if (sort == "asc")
+                        sql += " ORDER BY DonGia ASC";
+                    else if (sort == "desc")
+                        sql += " ORDER BY DonGia DESC";
+                }
 
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 if (!string.IsNullOrEmpty(keyword))
