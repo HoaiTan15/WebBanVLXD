@@ -13,7 +13,11 @@
         @foreach (var dm in danhMucs)
         {
             <div class="col text-center">
+<<<<<<< HEAD
                <a href="@Url.Action("Index","SanPham", new { madm = dm.MaDM })"
+=======
+                <a href="@Url.Action("Index","SanPham", new { madm = dm.MaDM, keyword = Request["keyword"] })"
+>>>>>>> 650b0a9cd4ceed0730b57d9d66b171c5df367d62
                    class="text-decoration-none text-dark">
                     <div class="category-card p-3 border rounded-3 bg-white hover-shadow-sm">
                         <img src="~/@dm.HinhAnh" class="category-img" />
