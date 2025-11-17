@@ -17,7 +17,10 @@ namespace WebBanVLXD.Controllers
         private static readonly ObjectCache TokenCache = MemoryCache.Default;
         private const int TokenExpirationHours = 1;
 
-        // ----------------- LOGIN -----------------
+        // ===========================================================
+        //                      LOGIN
+        // ===========================================================
+
         public ActionResult Login()
         {
             if (TempData["ResetSuccess"] != null)
@@ -32,36 +35,50 @@ namespace WebBanVLXD.Controllers
 
             using (SqlConnection conn = new SqlConnection(connStr))
             {
-                string sql = "SELECT * FROM NGUOIDUNG WHERE Email=@Email AND MatKhau=@MatKhau AND TrangThai='HoatDong'";
-                SqlCommand cmd = new SqlCommand(sql, conn);
+                string sql = @"SELECT MaUser, TenNguoiDung, Role, TrangThai 
+                              FROM NGUOIDUNG
+                              WHERE Email = @Email AND MatKhau = @MatKhau";
+        
+        SqlCommand cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@Email", Email);
                 cmd.Parameters.AddWithValue("@MatKhau", MatKhau);
-                conn.Open();
 
+                conn.Open();
                 SqlDataReader rd = cmd.ExecuteReader();
+
                 if (rd.Read())
                 {
                     user = new NGUOIDUNG
                     {
                         MaUser = rd["MaUser"].ToString(),
                         TenNguoiDung = rd["TenNguoiDung"].ToString(),
-                        Role = rd["Role"].ToString()
+                        Role = rd["Role"].ToString(),
+                        TrangThai = rd["TrangThai"].ToString()
                     };
                 }
             }
 
-            if (user != null)
+            if (user == null)
             {
-                Session["UserID"] = user.MaUser;
-                Session["UserName"] = user.TenNguoiDung;
-                Session["Role"] = user.Role;
-
-                return RedirectToAction("Index", "SanPham");
+                ViewBag.Error = "Sai email hoặc mật khẩu!";
+                return View();
             }
 
-            ViewBag.Error = "Sai email hoặc mật khẩu!";
-            return View();
+            // ❌ Bị khóa
+            if (user.TrangThai != null && user.TrangThai.Trim().ToLower() == "khoa")
+            {
+                ViewBag.Error = "Tài khoản của bạn đã bị khóa!";
+                return View();
+            }
+
+
+            Session["UserID"] = user.MaUser;
+            Session["UserName"] = user.TenNguoiDung;
+            Session["Role"] = user.Role;
+
+            return RedirectToAction("Index", "SanPham");
         }
+
 
         public ActionResult Logout()
         {
@@ -69,7 +86,10 @@ namespace WebBanVLXD.Controllers
             return RedirectToAction("Login");
         }
 
-        // ----------------- REGISTER -----------------
+        // ===========================================================
+        // REGISTER
+        // ===========================================================
+
         public ActionResult Register()
         {
             return View();
@@ -79,6 +99,7 @@ namespace WebBanVLXD.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Register(string TenNguoiDung, string Email, string MatKhau, string XacNhan, string SDT, string DiaChi)
         {
+            // Validate
             if (string.IsNullOrWhiteSpace(TenNguoiDung))
                 ModelState.AddModelError("TenNguoiDung", "Họ tên là bắt buộc.");
             if (string.IsNullOrWhiteSpace(Email))
@@ -91,7 +112,7 @@ namespace WebBanVLXD.Controllers
             if (!ModelState.IsValid)
                 return View();
 
-            // Kiểm tra trùng email
+            // Kiểm tra email tồn tại
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 string check = "SELECT COUNT(*) FROM NGUOIDUNG WHERE Email=@Email";
@@ -99,137 +120,131 @@ namespace WebBanVLXD.Controllers
                 cmd.Parameters.AddWithValue("@Email", Email);
                 conn.Open();
 
-                int exist = (int)cmd.ExecuteScalar();
-                if (exist > 0)
+                if ((int)cmd.ExecuteScalar() > 0)
                 {
-                    ModelState.AddModelError("Email", "Email này đã được sử dụng.");
+                    ModelState.AddModelError("Email", "Email đã được sử dụng.");
                     return View();
                 }
             }
 
-            // Tạo mã người dùng tự động (US0001, US0002, ...)
+            // Tạo mã User tự động
             string maUser;
             using (SqlConnection conn = new SqlConnection(connStr))
             {
-                string countQuery = "SELECT COUNT(*) FROM NGUOIDUNG";
-                SqlCommand cmd = new SqlCommand(countQuery, conn);
+                string q = "SELECT COUNT(*) FROM NGUOIDUNG";
+                SqlCommand cmd = new SqlCommand(q, conn);
                 conn.Open();
                 int count = (int)cmd.ExecuteScalar() + 1;
                 maUser = "US" + count.ToString("D4");
             }
 
-            // Thêm người dùng mới
+            // Thêm user
             using (SqlConnection conn = new SqlConnection(connStr))
             {
-                string insert = @"INSERT INTO NGUOIDUNG (MaUser, TenNguoiDung, MatKhau, Email, SDT, DiaChi, Role, TrangThai, NgayTao)
-                                  VALUES (@MaUser, @TenNguoiDung, @MatKhau, @Email, @SDT, @DiaChi, 'khach', 'HoatDong', GETDATE())";
-                SqlCommand cmd = new SqlCommand(insert, conn);
+                string sql = @"INSERT INTO NGUOIDUNG 
+                                (MaUser, TenNguoiDung, MatKhau, Email, SDT, DiaChi, Role, TrangThai, NgayTao)
+                               VALUES
+                                (@MaUser, @TenNguoiDung, @MatKhau, @Email, @SDT, @DiaChi, 'khach', 'HoatDong', GETDATE())";
+
+                SqlCommand cmd = new SqlCommand(sql, conn);
+
                 cmd.Parameters.AddWithValue("@MaUser", maUser);
                 cmd.Parameters.AddWithValue("@TenNguoiDung", TenNguoiDung);
                 cmd.Parameters.AddWithValue("@MatKhau", MatKhau);
                 cmd.Parameters.AddWithValue("@Email", Email);
-                cmd.Parameters.AddWithValue("@SDT", (object)SDT ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@DiaChi", (object)DiaChi ?? DBNull.Value);
+
+                // Cho phép null
+                cmd.Parameters.AddWithValue("@SDT",
+                    string.IsNullOrWhiteSpace(SDT) ? (object)DBNull.Value : SDT);
+
+                cmd.Parameters.AddWithValue("@DiaChi",
+                    string.IsNullOrWhiteSpace(DiaChi) ? (object)DBNull.Value : DiaChi);
+
                 conn.Open();
                 cmd.ExecuteNonQuery();
             }
 
-            TempData["RegisterSuccess"] = "Đăng ký thành công! Hãy đăng nhập.";
+            TempData["RegisterSuccess"] = "Đăng ký thành công!";
             return RedirectToAction("Login");
         }
 
-        // ----------------- FORGOT PASSWORD -----------------
-        public ActionResult ForgotPassword()
-        {
-            return View();
-        }
+        // ===========================================================
+        // SEND OTP
+        // ===========================================================
 
         [HttpPost]
         public JsonResult SendOtp()
         {
             try
             {
-                // Đọc dữ liệu từ AJAX (Email)
-                string requestBody;
+                string body;
                 using (var reader = new StreamReader(Request.InputStream))
                 {
                     reader.BaseStream.Seek(0, SeekOrigin.Begin);
-                    requestBody = reader.ReadToEnd();
+                    body = reader.ReadToEnd();
                 }
 
                 string email = null;
-                if (!string.IsNullOrWhiteSpace(requestBody))
+                if (!string.IsNullOrWhiteSpace(body))
                 {
-                    try
-                    {
-                        var js = new JavaScriptSerializer();
-                        var dict = js.Deserialize<Dictionary<string, string>>(requestBody);
-                        if (dict != null && dict.ContainsKey("Email"))
-                            email = dict["Email"];
-                    }
-                    catch { }
+                    var js = new JavaScriptSerializer();
+                    var dict = js.Deserialize<Dictionary<string, string>>(body);
+                    if (dict != null && dict.ContainsKey("Email"))
+                        email = dict["Email"];
                 }
-
-                if (string.IsNullOrEmpty(email))
-                    email = Request.Form["Email"];
 
                 if (string.IsNullOrEmpty(email))
                     return Json(new { success = false, message = "Email không được để trống." });
 
-                // Kiểm tra email có tồn tại hay không
-                string tenNguoiDung = null;
+                string ten = null;
                 using (SqlConnection conn = new SqlConnection(connStr))
                 {
-                    string q = "SELECT TenNguoiDung FROM NGUOIDUNG WHERE Email=@Email AND TrangThai='HoatDong'";
-                    SqlCommand cmd = new SqlCommand(q, conn);
+                    string sql = "SELECT TenNguoiDung FROM NGUOIDUNG WHERE Email=@Email AND TrangThai='HoatDong'";
+                    SqlCommand cmd = new SqlCommand(sql, conn);
                     cmd.Parameters.AddWithValue("@Email", email);
                     conn.Open();
                     var result = cmd.ExecuteScalar();
-                    if (result != null)
-                        tenNguoiDung = result.ToString();
+                    if (result != null) ten = result.ToString();
                 }
 
-                // Email không tồn tại trong hệ thống
-                if (tenNguoiDung == null)
-                {
-                    return Json(new { success = false, message = "Email này không tồn tại trong hệ thống. Vui lòng kiểm tra lại." });
-                }
+                if (ten == null)
+                    return Json(new { success = false, message = "Email không tồn tại." });
 
-                // Tạo OTP và lưu tạm
-                var otp = new Random().Next(100000, 999999).ToString();
-                var policyOtp = new CacheItemPolicy { AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(10) };
-                TokenCache.Set($"otp:{email.ToLowerInvariant()}", otp, policyOtp);
+                // Tạo OTP
+                string otp = new Random().Next(100000, 999999).ToString();
+                TokenCache.Set($"otp:{email.ToLower()}", otp,
+                    new CacheItemPolicy { AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(10) });
 
-                // Gửi email OTP
-                var body = $@"Xin chào {tenNguoiDung},<br/>
-                              Mã xác thực (OTP) của bạn là: <strong>{otp}</strong><br/>
-                              Mã có hiệu lực trong 10 phút.";
+                // Gửi email
+                string html = $"Xin chào {ten},<br/>Mã OTP: <b>{otp}</b>";
+                SendEmail(email, "Mã OTP - Đổi mật khẩu", html);
 
-                SendEmail(email, "Mã xác thực (OTP) - Đổi mật khẩu", body);
-                return Json(new { success = true, message = "Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư (hoặc thư rác)." });
+                return Json(new { success = true, message = "Đã gửi OTP!" });
             }
-            catch (Exception ex)
+            catch
             {
-                System.Diagnostics.Debug.WriteLine("SendOtp error: " + ex.Message);
-                return Json(new { success = false, message = "Có lỗi khi gửi mã OTP. Vui lòng thử lại sau." });
+                return Json(new { success = false, message = "Lỗi hệ thống!" });
             }
         }
 
-        // ----------------- VERIFY OTP -----------------
+        // ===========================================================
+        // VERIFY OTP
+        // ===========================================================
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult VerifyOtp(string Email, string Otp)
         {
             if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(Otp))
             {
-                ModelState.AddModelError("", "Email và mã OTP là bắt buộc.");
+                ModelState.AddModelError("", "Email và OTP là bắt buộc.");
                 return View("ForgotPassword");
             }
 
-            var cached = TokenCache.Get($"otp:{Email.ToLowerInvariant()}") as string;
-            if (string.IsNullOrEmpty(cached) || cached != Otp.Trim())
+            string cached = TokenCache.Get($"otp:{Email.ToLower()}") as string;
+            if (cached == null || cached != Otp)
             {
-                ModelState.AddModelError("", "Mã OTP không đúng hoặc đã hết hạn.");
+                ModelState.AddModelError("", "OTP không đúng.");
                 return View("ForgotPassword");
             }
 
@@ -240,36 +255,37 @@ namespace WebBanVLXD.Controllers
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@Email", Email);
                 conn.Open();
-                var result = cmd.ExecuteScalar();
-                if (result != null)
-                    maUser = result.ToString();
+                maUser = cmd.ExecuteScalar()?.ToString();
             }
 
             if (maUser == null)
             {
-                ModelState.AddModelError("", "Tài khoản không tồn tại.");
+                ModelState.AddModelError("", "Không tìm thấy tài khoản.");
                 return View("ForgotPassword");
             }
 
-            var resetToken = Guid.NewGuid().ToString("N");
-            var policy = new CacheItemPolicy { AbsoluteExpiration = DateTimeOffset.Now.AddHours(TokenExpirationHours) };
-            TokenCache.Set(resetToken, maUser, policy);
-            TokenCache.Remove($"otp:{Email.ToLowerInvariant()}");
+            string resetToken = Guid.NewGuid().ToString("N");
+            TokenCache.Set(resetToken, maUser,
+                new CacheItemPolicy { AbsoluteExpiration = DateTimeOffset.Now.AddHours(1) });
+
+            TokenCache.Remove($"otp:{Email.ToLower()}");
 
             return RedirectToAction("ResetPassword", new { token = resetToken });
         }
 
-        // ----------------- RESET PASSWORD -----------------
+        // ===========================================================
+        // RESET PASSWORD
+        // ===========================================================
+
         public ActionResult ResetPassword(string token)
         {
             if (string.IsNullOrEmpty(token) || !TokenCache.Contains(token))
             {
-                ViewBag.Error = "Link không hợp lệ hoặc đã hết hạn.";
+                ViewBag.Error = "Link không hợp lệ.";
                 return View("ResetPasswordInvalid");
             }
 
-            var model = new DoiMatKhau { Token = token };
-            return View(model);
+            return View(new DoiMatKhau { Token = token });
         }
 
         [HttpPost]
@@ -279,18 +295,13 @@ namespace WebBanVLXD.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            if (string.IsNullOrEmpty(model.Token) || !TokenCache.Contains(model.Token))
+            if (!TokenCache.Contains(model.Token))
             {
-                ModelState.AddModelError("", "Link không hợp lệ hoặc đã hết hạn.");
+                ModelState.AddModelError("", "Link hết hạn.");
                 return View(model);
             }
 
-            var maUser = TokenCache.Get(model.Token) as string;
-            if (string.IsNullOrEmpty(maUser))
-            {
-                ModelState.AddModelError("", "Token không hợp lệ.");
-                return View(model);
-            }
+            string maUser = TokenCache.Get(model.Token) as string;
 
             using (SqlConnection conn = new SqlConnection(connStr))
             {
@@ -303,45 +314,34 @@ namespace WebBanVLXD.Controllers
             }
 
             TokenCache.Remove(model.Token);
-            TempData["ResetSuccess"] = "Mật khẩu đã được cập nhật. Vui lòng đăng nhập.";
+            TempData["ResetSuccess"] = "Đổi mật khẩu thành công!";
             return RedirectToAction("Login");
         }
 
-        // ----------------- EMAIL SENDER -----------------
+        // ===========================================================
+        // GỬI EMAIL
+        // ===========================================================
+
         private void SendEmail(string toEmail, string subject, string bodyHtml)
         {
-            var smtpSection = ConfigurationManager.GetSection("system.net/mailSettings/smtp") as System.Net.Configuration.SmtpSection;
-            if (smtpSection != null && smtpSection.Network != null)
-            {
-                var from = smtpSection.From;
-                using (var msg = new MailMessage(from, toEmail))
-                {
-                    msg.Subject = subject;
-                    msg.Body = bodyHtml;
-                    msg.IsBodyHtml = true;
+            var smtp = ConfigurationManager.GetSection("system.net/mailSettings/smtp")
+                        as System.Net.Configuration.SmtpSection;
 
-                    using (var client = new SmtpClient())
-                    {
-                        client.Send(msg);
-                    }
-                }
+            using (var msg = new MailMessage(smtp.From, toEmail))
+            {
+                msg.Subject = subject;
+                msg.Body = bodyHtml;
+                msg.IsBodyHtml = true;
+
+                using (var client = new SmtpClient())
+                    client.Send(msg);
             }
         }
 
-        // ----------------- TEST EMAIL -----------------
-        public ActionResult TestEmail()
-        {
-            try
-            {
-                SendEmail("herophan1503@gmail.com", "Test OTP", "<b>Mail thử nghiệm gửi từ WebBanVLXD</b>");
-                return Content("✅ Gửi mail thành công! Hãy kiểm tra hộp thư đến hoặc thư rác.");
-            }
-            catch (Exception ex)
-            {
-                return Content(" Lỗi khi gửi mail: " + ex.Message);
-            }
-        }
-        // ----------------- XEM THÔNG TIN -----------------
+        // ===========================================================
+        // XEM THÔNG TIN
+        // ===========================================================
+
         public ActionResult ThongTin()
         {
             if (Session["UserID"] == null)
@@ -356,7 +356,8 @@ namespace WebBanVLXD.Controllers
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@MaUser", maUser);
                 conn.Open();
-                SqlDataReader rd = cmd.ExecuteReader();
+
+                var rd = cmd.ExecuteReader();
                 if (rd.Read())
                 {
                     user = new NGUOIDUNG
@@ -374,7 +375,10 @@ namespace WebBanVLXD.Controllers
             return View(user);
         }
 
-        // ----------------- SỬA THÔNG TIN (GET) -----------------
+        // ===========================================================
+        // SỬA THÔNG TIN
+        // ===========================================================
+
         public ActionResult SuaThongTin()
         {
             if (Session["UserID"] == null)
@@ -389,7 +393,8 @@ namespace WebBanVLXD.Controllers
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@MaUser", maUser);
                 conn.Open();
-                SqlDataReader rd = cmd.ExecuteReader();
+
+                var rd = cmd.ExecuteReader();
                 if (rd.Read())
                 {
                     user = new NGUOIDUNG
@@ -407,7 +412,6 @@ namespace WebBanVLXD.Controllers
             return View(user);
         }
 
-        // ----------------- SỬA THÔNG TIN (POST) -----------------
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult SuaThongTin(NGUOIDUNG model)
@@ -421,13 +425,23 @@ namespace WebBanVLXD.Controllers
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 string sql = @"UPDATE NGUOIDUNG 
-                       SET TenNguoiDung=@TenNguoiDung, SDT=@SDT, DiaChi=@DiaChi 
-                       WHERE MaUser=@MaUser";
+                               SET TenNguoiDung=@TenNguoiDung,
+                                   SDT=@SDT,
+                                   DiaChi=@DiaChi
+                               WHERE MaUser=@MaUser";
+
                 SqlCommand cmd = new SqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@TenNguoiDung", model.TenNguoiDung ?? "");
-                cmd.Parameters.AddWithValue("@SDT", model.SDT ?? "");
-                cmd.Parameters.AddWithValue("@DiaChi", model.DiaChi ?? "");
+
+                cmd.Parameters.AddWithValue("@TenNguoiDung", model.TenNguoiDung);
+
+                cmd.Parameters.AddWithValue("@SDT",
+                    string.IsNullOrWhiteSpace(model.SDT) ? (object)DBNull.Value : model.SDT);
+
+                cmd.Parameters.AddWithValue("@DiaChi",
+                    string.IsNullOrWhiteSpace(model.DiaChi) ? (object)DBNull.Value : model.DiaChi);
+
                 cmd.Parameters.AddWithValue("@MaUser", model.MaUser);
+
                 conn.Open();
                 cmd.ExecuteNonQuery();
             }
@@ -435,7 +449,5 @@ namespace WebBanVLXD.Controllers
             TempData["UpdateSuccess"] = "Cập nhật thông tin thành công!";
             return RedirectToAction("ThongTin");
         }
-
-
     }
 }

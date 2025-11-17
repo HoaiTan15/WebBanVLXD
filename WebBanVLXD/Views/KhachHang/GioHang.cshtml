@@ -48,13 +48,13 @@
                         <td>
                             <form action="@Url.Action("CapNhatGio", "KhachHang")" method="post" class="d-inline">
                                 <input type="hidden" name="id" value="@sp.MaSP" />
-                                <input type="number" name="soLuong" value="@sp.SoLuongTon"
+                                <input type="number" name="soLuong" value="@sp.SoLuongMua"
                                        min="1"
                                        class="form-control w-50 d-inline-block" />
                                 <button type="submit" class="btn btn-sm btn-outline-primary">Cập nhật</button>
                             </form>
                         </td>
-                        <td>@string.Format("{0:N0} đ", sp.DonGia * sp.SoLuongTon)</td>
+                        <td>@string.Format("{0:N0} đ", sp.DonGia * sp.SoLuongMua)</td>
                         <td>
                             <a href="@Url.Action("XoaKhoiGio", "KhachHang", new { id = sp.MaSP.Trim() })"
                                class="btn btn-danger btn-sm">

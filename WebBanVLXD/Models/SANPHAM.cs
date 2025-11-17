@@ -19,6 +19,8 @@ namespace WebBanVLXD.Models
         public int SoLuongMua { get; set; }
         public string TenNCC { get; set; }
         public string TenDM { get; set; }
+        public string TrangThai { get; set; }
+
 
     }
 }

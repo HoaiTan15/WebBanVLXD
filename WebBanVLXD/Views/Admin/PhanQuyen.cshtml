@@ -3,6 +3,17 @@
     ViewBag.Title = "Phân quyền người dùng";
     Layout = "~/Views/Shared/_LayoutShop.cshtml";
 }
+<div class="container mt-4 mb-4">
+    <div class="alert alert-primary shadow-sm">
+        <h4><i class="fa fa-gear"></i> Bảng điều khiển quản trị</h4>
+        <div class="d-flex flex-wrap gap-2 mt-3">
+            <a href="@Url.Action("QLTaiKhoan","Admin")" class="btn btn-info"><i class="fa fa-users"></i> Quản lý tài khoản</a>
+            <a href="@Url.Action("QLSanPham","Admin")" class="btn btn-success"><i class="fa fa-box"></i> Quản lý sản phẩm</a>
+            <a href="@Url.Action("PhanQuyen","Admin")" class="btn btn-warning text-dark"><i class="fa fa-user-shield"></i> Phân quyền</a>
+            <a href="@Url.Action("ThongKe","Admin")" class="btn btn-secondary"><i class="fa fa-chart-line"></i> Thống kê</a>
+        </div>
+    </div>
+</div>
 
 <div class="container mt-4">
     <h3 class="text-primary mb-3"><i class="fa fa-users-gear"></i> PHÂN QUYỀN NGƯỜI DÙNG</h3>
@@ -20,7 +31,6 @@
                 <th>Email</th>
                 <th>Số điện thoại</th>
                 <th>Vai trò</th>
-                <th>Trạng thái</th>
                 <th>Thao tác</th>
             </tr>
         </thead>
@@ -32,6 +42,8 @@
                     <td>@u.TenNguoiDung</td>
                     <td>@u.Email</td>
                     <td>@u.SDT</td>
+
+                    <!-- Vai trò -->
                     <td>
                         <form method="post" action="@Url.Action("CapNhatQuyen", "Admin")" class="d-flex justify-content-center">
                             <input type="hidden" name="maUser" value="@u.MaUser" />
@@ -45,12 +57,42 @@
                             </button>
                         </form>
                     </td>
-                    <td>@u.TrangThai</td>
+
+                    <!-- Khóa / Mở khóa -->
                     <td class="text-center">
-                        <a href="#" class="btn btn-danger btn-sm"><i class="fa fa-ban"></i> Khóa</a>
+                        @if (u.TrangThai == "HoatDong")
+                        {
+                            <form method="post" action="@Url.Action("KhoaUser", "Admin")" style="display:inline;" onsubmit="return confirmKhoa()">
+                                <input type="hidden" name="maUser" value="@u.MaUser" />
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="fa fa-ban"></i> Khóa
+                                </button>
+                            </form>
+
+                        }
+                        else
+                        {
+                            <form method="post" action="@Url.Action("MoKhoaUser", "Admin")" style="display:inline;" onsubmit="return confirmMoKhoa()">
+                                <input type="hidden" name="maUser" value="@u.MaUser" />
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    <i class="fa fa-unlock"></i> Mở khóa
+                                </button>
+                            </form>
+
+                        }
                     </td>
+
                 </tr>
             }
         </tbody>
     </table>
 </div>
+<script>
+    function confirmKhoa() {
+        return confirm("Bạn có chắc chắn muốn KHÓA tài khoản này?");
+    }
+
+    function confirmMoKhoa() {
+        return confirm("Bạn có chắc chắn muốn MỞ KHÓA tài khoản này?");
+    }
+</script>

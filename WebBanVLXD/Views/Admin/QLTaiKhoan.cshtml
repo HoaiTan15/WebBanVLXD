@@ -1,25 +1,34 @@
 ﻿@model List<WebBanVLXD.Models.NGUOIDUNG>
 @{
-<<<<<<< HEAD
-    Layout = "~/Views/Shared/_LayoutShop.cshtml";
-=======
->>>>>>> 650b0a9cd4ceed0730b57d9d66b171c5df367d62
     ViewBag.Title = "Danh sách tài khoản";
 }
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-
+<div class="container mt-4 mb-4">
+    <div class="alert alert-primary shadow-sm">
+        <h4><i class="fa fa-gear"></i> Bảng điều khiển quản trị</h4>
+        <div class="d-flex flex-wrap gap-2 mt-3">
+            <a href="@Url.Action("QLTaiKhoan","Admin")" class="btn btn-info"><i class="fa fa-users"></i> Quản lý tài khoản</a>
+            <a href="@Url.Action("QLSanPham","Admin")" class="btn btn-success"><i class="fa fa-box"></i> Quản lý sản phẩm</a>
+            <a href="@Url.Action("PhanQuyen","Admin")" class="btn btn-warning text-dark"><i class="fa fa-user-shield"></i> Phân quyền</a>
+            <a href="@Url.Action("ThongKe","Admin")" class="btn btn-secondary"><i class="fa fa-chart-line"></i> Thống kê</a>
+        </div>
+    </div>
+</div>
 <div class="container mt-4">
 
     <h3 class="mb-4">
         <i class="fa fa-users"></i> Danh sách tài khoản
     </h3>
 
+    <!-- NÚT THÊM -->
     <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addUserModal">
         <i class="fa fa-plus-circle"></i> Thêm tài khoản mới
     </button>
 
+    <!-- ============================== -->
     <!-- POPUP THÊM TÀI KHOẢN -->
+    <!-- ============================== -->
     <div class="modal fade" id="addUserModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -33,8 +42,8 @@
 
                 <form method="post" action="@Url.Action("ThemTaiKhoan","Admin")">
                     <div class="modal-body">
-
                         <div class="row g-3">
+
                             <div class="col-md-6">
                                 <label class="form-label">Tên người dùng</label>
                                 <input name="TenNguoiDung" class="form-control" required />
@@ -70,16 +79,13 @@
                             </div>
 
                         </div>
-
                     </div>
 
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">
                             <i class="fa fa-check"></i> Thêm
                         </button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Hủy
-                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                     </div>
                 </form>
 
@@ -87,12 +93,12 @@
         </div>
     </div>
 
-
-    <!-- DANH SÁCH TÀI KHOẢN -->
+    <!-- ============================== -->
+    <!-- BẢNG DANH SÁCH TÀI KHOẢN -->
+    <!-- ============================== -->
     <table class="table table-striped table-bordered">
         <thead class="table-dark">
             <tr>
-                <!-- BỎ MÃ USER -->
                 <th>Họ tên</th>
                 <th>Email</th>
                 <th>SĐT</th>
@@ -133,29 +139,131 @@
                     <td>@u.NgayTao.ToString("dd/MM/yyyy")</td>
 
                     <td>
-                        <a href="@Url.Action("XoaTaiKhoan","Admin", new { ma = u.MaUser })"
-                           class="btn btn-danger btn-sm">
-                            <i class="fa fa-trash"></i> Xóa
+
+                        <!-- NÚT SỬA -->
+                        <button class="btn btn-warning btn-sm me-1"
+                                onclick="showEditModal(
+                                    '@u.MaUser',
+                                    '@u.TenNguoiDung',
+                                    '@u.Email',
+                                    '@u.SDT',
+                                    '@u.DiaChi',
+                                    '@u.Role'
+                                )">
+                            <i class="fa fa-edit"></i>
+                        </button>
+
+                        <!-- NÚT XÓA -->
+                        <a href="@Url.Action("XoaTaiKhoan","Admin", new { ma = u.MaUser.Trim() })"
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('Bạn có chắc muốn xóa tài khoản này?');">
+                            <i class="fa fa-trash"></i>
                         </a>
+
                     </td>
                 </tr>
             }
         </tbody>
     </table>
+
 </div>
 
-<script>
-    // Hiện form
-    document.getElementById("btnShowForm").onclick = function () {
-        document.getElementById("addForm").style.display = "block";
-        this.style.display = "none";
-    };
+<!-- ============================== -->
+<!-- POPUP SỬA TÀI KHOẢN -->
+<!-- ============================== -->
+<div class="modal fade" id="editUserModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
 
-    // Ẩn form
-    document.getElementById("btnHideForm").onclick = function () {
-        document.getElementById("addForm").style.display = "none";
-        document.getElementById("btnShowForm").style.display = "inline-block";
-    };
-</script>
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fa fa-edit"></i> Sửa tài khoản
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form method="post" action="@Url.Action("SuaTaiKhoan","Admin")"
+                  onsubmit="return validateEditForm()">
+                <div class="modal-body">
+
+                    <input type="hidden" id="edit_ma" name="MaUser" />
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label">Tên người dùng</label>
+                            <input id="edit_ten" name="TenNguoiDung" class="form-control" required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input id="edit_email" name="Email" type="email" class="form-control" required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">SĐT</label>
+                            <input id="edit_sdt" name="SDT" class="form-control" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Địa chỉ</label>
+                            <input id="edit_diachi" name="DiaChi" class="form-control" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Vai trò</label>
+                            <select id="edit_role" name="Role" class="form-select">
+                                <option value="khach">Khách</option>
+                                <option value="quanly">Quản lý</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-check"></i> Lưu thay đổi
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- ============================== -->
+<!-- SCRIPT -->
+<!-- ============================== -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+<script>
+    function showEditModal(ma, ten, email, sdt, diachi, role) {
+
+        document.getElementById("edit_ma").value = ma;
+        document.getElementById("edit_ten").value = ten;
+        document.getElementById("edit_email").value = email;
+        document.getElementById("edit_sdt").value = sdt;
+        document.getElementById("edit_diachi").value = diachi;
+        document.getElementById("edit_role").value = role;
+
+        var modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+        modal.show();
+    }
+</script>
+<script>
+    function validateEditForm() {
+        let ten = document.getElementById("edit_ten").value.trim();
+        let email = document.getElementById("edit_email").value.trim();
+
+        if (ten === "" || email === "") {
+            return confirm("⚠ Một số thông tin bắt buộc đang trống.\nBạn có chắc muốn lưu không?");
+        }
+
+        return true;
+    }
+</script>

@@ -61,47 +61,51 @@ namespace WebBanVLXD.Controllers
         }
 
         [HttpPost]
-        public ActionResult ThemTaiKhoan(string ma, string ten, string email, string matkhau, string sdt, string diachi, string role)
+        public ActionResult ThemTaiKhoan(string TenNguoiDung, string Email, string MatKhau, string SDT, string DiaChi, string Role)
         {
             if (!IsAdmin())
                 return RedirectToAction("Login", "Account");
 
             using (SqlConnection conn = new SqlConnection(connStr))
             {
-                string sql = "INSERT INTO NGUOIDUNG (MaUser, TenNguoiDung, MatKhau, Email, SDT, DiaChi, Role, TrangThai, NgayTao) " +
-                             "VALUES (@ma, @ten, @matkhau, @em, @sdt, @dc, @role, 'HoatDong', GETDATE())";
+                string sql = "INSERT INTO NGUOIDUNG (TenNguoiDung, MatKhau, Email, SDT, DiaChi, Role, TrangThai, NgayTao) " +
+                             "VALUES (@ten, @matkhau, @em, @sdt, @dc, @role, 'HoatDong', GETDATE())";
+
                 SqlCommand cmd = new SqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@ma", ma);
-                cmd.Parameters.AddWithValue("@ten", ten);
-                cmd.Parameters.AddWithValue("@matkhau", matkhau);
-                cmd.Parameters.AddWithValue("@em", email);
-                cmd.Parameters.AddWithValue("@sdt", sdt);
-                cmd.Parameters.AddWithValue("@dc", diachi);
-                cmd.Parameters.AddWithValue("@role", role);
+                cmd.Parameters.AddWithValue("@ten", TenNguoiDung);
+                cmd.Parameters.AddWithValue("@matkhau", MatKhau);
+                cmd.Parameters.AddWithValue("@em", Email);
+                cmd.Parameters.AddWithValue("@sdt", SDT);
+                cmd.Parameters.AddWithValue("@dc", DiaChi);
+                cmd.Parameters.AddWithValue("@role", Role);
 
                 conn.Open();
                 cmd.ExecuteNonQuery();
             }
+
             return RedirectToAction("QLTaiKhoan");
         }
 
-        [HttpPost]
+
+        [HttpGet]
         public ActionResult XoaTaiKhoan(string ma)
         {
-            if (!IsAdmin())
-                return RedirectToAction("Login", "Account");
+            if (string.IsNullOrWhiteSpace(ma))
+                return RedirectToAction("QLTaiKhoan");
 
             using (SqlConnection conn = new SqlConnection(connStr))
             {
-                string sql = "DELETE FROM NGUOIDUNG WHERE MaUser = @ma";
+                string sql = "DELETE FROM NGUOIDUNG WHERE MaUser=@Ma";
                 SqlCommand cmd = new SqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@ma", ma);
+                cmd.Parameters.AddWithValue("@Ma", ma.Trim());
 
                 conn.Open();
                 cmd.ExecuteNonQuery();
             }
+
             return RedirectToAction("QLTaiKhoan");
         }
+
 
 
         // =====================================================
@@ -116,16 +120,13 @@ namespace WebBanVLXD.Controllers
 
             using (SqlConnection conn = new SqlConnection(connStr))
             {
-                string sql = @"
-SELECT 
-    SP.MaSP, SP.TenSP, SP.DonGia, SP.DonViTinh, SP.SoLuongTon, 
-    SP.HinhAnh, SP.MoTa,
-    SP.MaNCC, NCC.TenNCC,
-    SP.MaDM, DM.TenDM
-FROM SANPHAM SP
-LEFT JOIN NHACUNGCAP NCC ON SP.MaNCC = NCC.MaNCC
-LEFT JOIN DANHMUC DM ON SP.MaDM = DM.MaDM
-";
+                string sql = @"SELECT 
+                                    SP.MaSP, SP.TenSP, SP.DonGia, SP.DonViTinh, SP.SoLuongTon, 
+                                    SP.HinhAnh, SP.MoTa, SP.MaNCC, SP.MaDM, SP.TrangThai,
+                                    NCC.TenNCC, DM.TenDM
+                                FROM SANPHAM SP
+                                LEFT JOIN NHACUNGCAP NCC ON SP.MaNCC = NCC.MaNCC
+                                LEFT JOIN DANHMUC DM ON SP.MaDM = DM.MaDM";
 
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 conn.Open();
@@ -145,7 +146,8 @@ LEFT JOIN DANHMUC DM ON SP.MaDM = DM.MaDM
                         MaNCC = rd["MaNCC"].ToString(),
                         TenNCC = rd["TenNCC"].ToString(),
                         MaDM = rd["MaDM"].ToString(),
-                        TenDM = rd["TenDM"].ToString()
+                        TenDM = rd["TenDM"].ToString(),
+                        TrangThai = rd["TrangThai"].ToString()
                     });
                 }
             }
@@ -274,20 +276,22 @@ WHERE MaSP = @ma";
         }
 
         [HttpPost]
-        public ActionResult XoaSanPham(string ma)
+        public ActionResult NgungKinhDoanh(string ma)
         {
-                if (!IsAdmin())
-        return RedirectToAction("Login", "Account");
-
             using (SqlConnection conn = new SqlConnection(connStr))
             {
-                string sql = "DELETE FROM SANPHAM WHERE MaSP = @ma";
+                string sql = @"UPDATE SANPHAM 
+                       SET TrangThai = 'NgungKinhDoanh' 
+                       WHERE MaSP = @MaSP";
+
                 SqlCommand cmd = new SqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@ma", ma);
+                cmd.Parameters.AddWithValue("@MaSP", ma);
 
                 conn.Open();
                 cmd.ExecuteNonQuery();
             }
+
+            TempData["Success"] = "Sản phẩm đã được chuyển sang trạng thái ngừng kinh doanh!";
             return RedirectToAction("QLSanPham");
         }
 
@@ -345,6 +349,39 @@ WHERE MaSP = @ma";
             TempData["ThongBao"] = "Cập nhật quyền thành công!";
             return RedirectToAction("PhanQuyen");
         }
+        [HttpPost]
+        public ActionResult KhoaUser(string maUser)
+        {
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                string sql = "UPDATE NGUOIDUNG SET TrangThai = 'Khoa' WHERE MaUser = @ma";
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@ma", maUser);
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+
+            TempData["ThongBao"] = "Đã khóa tài khoản!";
+            return RedirectToAction("PhanQuyen");
+        }
+        [HttpPost]
+        public ActionResult MoKhoaUser(string maUser)
+        {
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                string sql = "UPDATE NGUOIDUNG SET TrangThai = 'HoatDong' WHERE MaUser = @ma";
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@ma", maUser);
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+
+            TempData["ThongBao"] = "Đã mở khóa tài khoản!";
+            return RedirectToAction("PhanQuyen");
+        }
+
 
 
         // =====================================================
@@ -424,6 +461,49 @@ WHERE MaSP = @ma";
             }
             return list;
         }
+        [HttpPost]
+        public ActionResult SuaTaiKhoan(NGUOIDUNG u)
+        {
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                string sql = @"UPDATE NGUOIDUNG SET 
+                        TenNguoiDung=@ten,
+                        Email=@em,
+                        SDT=@sdt,
+                        DiaChi=@dc,
+                        Role=@role
+                       WHERE MaUser=@ma";
+
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@ma", u.MaUser);
+                cmd.Parameters.AddWithValue("@ten", u.TenNguoiDung);
+                cmd.Parameters.AddWithValue("@em", u.Email);
+                cmd.Parameters.AddWithValue("@sdt", string.IsNullOrWhiteSpace(u.SDT) ? (object)DBNull.Value : u.SDT);
+                cmd.Parameters.AddWithValue("@dc", string.IsNullOrWhiteSpace(u.DiaChi) ? (object)DBNull.Value : u.DiaChi);
+                cmd.Parameters.AddWithValue("@role", u.Role);
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+            return RedirectToAction("QLTaiKhoan");
+        }
+        [HttpGet]
+        public ActionResult KinhDoanhLai(string ma)
+        {
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                string sql = "UPDATE SANPHAM SET TrangThai='HoatDong' WHERE MaSP=@ma";
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@ma", ma);
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+
+            TempData["Success"] = "Sản phẩm đã mở bán lại!";
+            return RedirectToAction("QLSanPham");
+        }
+
+
 
     }
 }

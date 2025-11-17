@@ -3,7 +3,17 @@
     ViewBag.Title = "Quản lý sản phẩm";
     Layout = "~/Views/Shared/_LayoutShop.cshtml";
 }
-
+<div class="container mt-4 mb-4">
+    <div class="alert alert-primary shadow-sm">
+        <h4><i class="fa fa-gear"></i> Bảng điều khiển quản trị</h4>
+        <div class="d-flex flex-wrap gap-2 mt-3">
+            <a href="@Url.Action("QLTaiKhoan","Admin")" class="btn btn-info"><i class="fa fa-users"></i> Quản lý tài khoản</a>
+            <a href="@Url.Action("QLSanPham","Admin")" class="btn btn-success"><i class="fa fa-box"></i> Quản lý sản phẩm</a>
+            <a href="@Url.Action("PhanQuyen","Admin")" class="btn btn-warning text-dark"><i class="fa fa-user-shield"></i> Phân quyền</a>
+            <a href="@Url.Action("ThongKe","Admin")" class="btn btn-secondary"><i class="fa fa-chart-line"></i> Thống kê</a>
+        </div>
+    </div>
+</div>
 <div class="container mt-4 mb-5">
     <h3 class="fw-bold text-primary mb-3">
         <i class="fa fa-cubes"></i> Danh sách sản phẩm
@@ -14,10 +24,8 @@
         <div class="card-body">
             <h5 class="card-title text-success mb-3"><i class="fa fa-plus-circle"></i> Thêm sản phẩm mới</h5>
 
-            <form method="post" action="@Url.Action("ThemSanPham", "Admin")" class="row g-3">
-                <div class="col-md-2">
-                    <input name="ma" class="form-control" placeholder="Mã sản phẩm" required />
-                </div>
+            <form method="post" action="@Url.Action("ThemSanPham", "Admin")" enctype="multipart/form-data" class="row g-3">
+               
                 <div class="col-md-3">
                     <input name="ten" class="form-control" placeholder="Tên sản phẩm" required />
                 </div>
@@ -63,6 +71,7 @@
                 <th>Mô tả</th>
                 <th>Nhà CC</th>
                 <th>Danh mục</th>
+                <th>Trạng thái</th>
                 <th>Thao tác</th>
             </tr>
         </thead>
@@ -75,27 +84,59 @@
                     <td>@sp.DonViTinh</td>
                     <td>@sp.SoLuongTon</td>
                     <td>
-                        <img src="@Url.Content("~/" + sp.HinhAnh)" alt="Ảnh" width="70" height="70" style="object-fit:cover;border-radius:8px;" />
-
+                        <img src="@Url.Content("~/" + sp.HinhAnh)" alt="Ảnh" width="70" height="70"
+                             style="object-fit:cover;border-radius:8px;" />
                     </td>
                     <td>@sp.MoTa</td>
                     <td>@sp.TenNCC</td>
                     <td>@sp.TenDM</td>
-                    <td class="d-flex gap-2">
 
+                    <!-- TRẠNG THÁI -->
+                    <td>
+                        @if (sp.TrangThai == "NgungKinhDoanh")
+                        {
+                            <span class="badge bg-danger">Ngừng KD</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">Đang bán</span>
+                        }
+                    </td>
+
+                    <td class="d-flex flex-column gap-2">
+
+                        <!-- SỬA -->
                         <a href="@Url.Action("SuaSanPham", "Admin", new { id = sp.MaSP.Trim() })"
                            class="btn btn-warning btn-sm">
                             <i class="fa fa-edit"></i> Sửa
                         </a>
 
-                        <form method="post" action="@Url.Action("XoaSanPham","Admin")">
-                            <input type="hidden" name="ma" value="@sp.MaSP" />
-                            <button class="btn btn-danger btn-sm">
-                                <i class="fa fa-trash"></i> Xóa
-                            </button>
-                        </form>
+                        <!-- NÚT NGỪNG KINH DOANH / KINH DOANH LẠI (POST) -->
+                        @if (sp.TrangThai == "NgungKinhDoanh")
+                        {
+                            <!-- KINH DOANH LẠI -->
+                            <form method="post" action="@Url.Action("KinhDoanhLai", "Admin")"
+                                  onsubmit="return confirm('Bạn muốn mở bán lại sản phẩm này?');">
+                                <input type="hidden" name="ma" value="@sp.MaSP" />
+                                <button class="btn btn-success btn-sm w-100">
+                                    <i class="fa fa-undo"></i> Kinh doanh lại
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <!-- NGỪNG KINH DOANH -->
+                            <form method="post" action="@Url.Action("NgungKinhDoanh", "Admin")"
+                                  onsubmit="return confirm('Bạn chắc chắn muốn NGỪNG bán sản phẩm này?');">
+                                <input type="hidden" name="ma" value="@sp.MaSP" />
+                                <button class="btn btn-danger btn-sm w-100">
+                                    <i class="fa fa-ban"></i> Ngừng KD
+                                </button>
+                            </form>
+                        }
 
                     </td>
+
                 </tr>
             }
         </tbody>
