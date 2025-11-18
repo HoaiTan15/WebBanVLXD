@@ -3,7 +3,18 @@
     ViewBag.Title = "Quản lý đơn hàng";
     Layout = "~/Views/Shared/_LayoutShop.cshtml";
 }
-
+<div class="container mt-4 mb-4">
+    <div class="alert alert-success shadow-sm">
+        <h4><i class="fa fa-briefcase"></i> Bảng điều khiển quản lý</h4>
+        <div class="d-flex flex-wrap gap-2 mt-3">
+            <a href="@Url.Action("QLSanPham","QuanLy")" class="btn btn-primary"><i class="fa fa-box"></i> Quản lý sản phẩm</a>
+            <a href="@Url.Action("QLNhapHang","QuanLy")" class="btn btn-success"><i class="fa fa-download"></i> Nhập hàng</a>
+            <a href="@Url.Action("QLTonKho","QuanLy")" class="btn btn-info text-white"><i class="fa fa-cubes"></i> Tồn kho</a>
+            <a href="@Url.Action("BaoCaoDoanhThu","QuanLy")" class="btn btn-danger"><i class="fa fa-bar-chart"></i> Báo cáo</a>
+            <a href="@Url.Action("QLDonHang","QuanLy")" class="btn btn-primary btn-lg"><i class="fa fa-box"></i> Đơn hàng</a>
+        </div>
+    </div>
+</div>
 <div class="container mt-4">
     <h3 class="text-primary mb-4">
         <i class="fa fa-box"></i> Danh sách đơn hàng
@@ -42,6 +53,10 @@
             }
         </tbody>
     </table>
-
+    <div class="text-end">
+        <a href="@Url.Action("Index", "SanPham")" class="btn btn-secondary">
+            <i class="fa fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
 
 </div>

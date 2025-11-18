@@ -9,21 +9,23 @@ namespace WebBanVLXD.Controllers
 {
     public class SanPhamController : Controller
     {
-        private readonly string connStr = ConfigurationManager.ConnectionStrings["VLXD_DBConnectionString"].ConnectionString;
+        private readonly string connStr =
+            ConfigurationManager.ConnectionStrings["VLXD_DBConnectionString"].ConnectionString;
 
         // ----------------- DANH SÁCH SẢN PHẨM -----------------
         public ActionResult Index(string keyword, string madm, string sort)
         {
-            List<SANPHAM> sanPhams = new List<SANPHAM>();
-            List<DANHMUC> danhMucs = new List<DANHMUC>();
+            var sanPhams = new List<SANPHAM>();
+            var danhMucs = new List<DANHMUC>();
 
-            // ================== LẤY DANH MỤC ==================
-            using (SqlConnection conn = new SqlConnection(connStr))
+            // Lấy danh mục
+            using (var conn = new SqlConnection(connStr))
             {
                 string sqlDM = "SELECT * FROM DANHMUC";
-                SqlCommand cmdDM = new SqlCommand(sqlDM, conn);
+                var cmdDM = new SqlCommand(sqlDM, conn);
+
                 conn.Open();
-                SqlDataReader rdDM = cmdDM.ExecuteReader();
+                var rdDM = cmdDM.ExecuteReader();
                 while (rdDM.Read())
                 {
                     danhMucs.Add(new DANHMUC
@@ -33,34 +35,37 @@ namespace WebBanVLXD.Controllers
                         HinhAnh = rdDM["HinhAnh"].ToString()
                     });
                 }
-                conn.Close();
             }
 
-            // ================== LẤY SẢN PHẨM ==================
-            using (SqlConnection conn = new SqlConnection(connStr))
+            // Lấy sản phẩm
+            using (var conn = new SqlConnection(connStr))
             {
                 string sql = "SELECT * FROM SANPHAM WHERE 1=1";
+
                 if (!string.IsNullOrEmpty(keyword))
                     sql += " AND TenSP LIKE @keyword";
+
                 if (!string.IsNullOrEmpty(madm))
                     sql += " AND MaDM = @madm";
 
                 if (!string.IsNullOrEmpty(sort))
                 {
-                    if (sort == "asc")
-                        sql += " ORDER BY DonGia ASC";
-                    else if (sort == "desc")
-                        sql += " ORDER BY DonGia DESC";
+                    sql += sort == "asc"
+                        ? " ORDER BY DonGia ASC"
+                        : " ORDER BY DonGia DESC";
                 }
 
-                SqlCommand cmd = new SqlCommand(sql, conn);
+                var cmd = new SqlCommand(sql, conn);
+
                 if (!string.IsNullOrEmpty(keyword))
                     cmd.Parameters.AddWithValue("@keyword", "%" + keyword + "%");
+
                 if (!string.IsNullOrEmpty(madm))
                     cmd.Parameters.AddWithValue("@madm", madm);
 
                 conn.Open();
-                SqlDataReader rd = cmd.ExecuteReader();
+                var rd = cmd.ExecuteReader();
+
                 while (rd.Read())
                 {
                     sanPhams.Add(new SANPHAM
@@ -76,18 +81,14 @@ namespace WebBanVLXD.Controllers
                         MaDM = rd["MaDM"].ToString()
                     });
                 }
-                conn.Close();
             }
 
-            // ================== GẮN DỮ LIỆU VÀO VIEW ==================
             ViewBag.DanhMuc = danhMucs;
-
-            // ================== KIỂM TRA ADMIN ==================
-            ViewBag.IsAdmin = (Session["Role"] != null && Session["Role"].ToString() == "admin");
+            ViewBag.IsAdmin = (Session["Role"] != null &&
+                               Session["Role"].ToString() == "admin");
 
             return View(sanPhams);
         }
-
 
         // ----------------- CHI TIẾT SẢN PHẨM -----------------
         public ActionResult ChiTiet(string id)
@@ -95,18 +96,20 @@ namespace WebBanVLXD.Controllers
             if (string.IsNullOrEmpty(id))
                 return HttpNotFound();
 
-            id = id.Trim(); 
+            id = id.Trim();
             SANPHAM sp = null;
             string tenDanhMuc = "";
 
-            using (SqlConnection conn = new SqlConnection(connStr))
+            // Lấy thông tin sản phẩm
+            using (var conn = new SqlConnection(connStr))
             {
                 string sql = "SELECT * FROM SANPHAM WHERE MaSP=@MaSP";
-                SqlCommand cmd = new SqlCommand(sql, conn);
+                var cmd = new SqlCommand(sql, conn);
+
                 cmd.Parameters.AddWithValue("@MaSP", id);
                 conn.Open();
 
-                SqlDataReader rd = cmd.ExecuteReader();
+                var rd = cmd.ExecuteReader();
                 if (rd.Read())
                 {
                     sp = new SANPHAM
@@ -122,20 +125,22 @@ namespace WebBanVLXD.Controllers
                         MaDM = rd["MaDM"].ToString()
                     };
                 }
-                conn.Close();
             }
 
             if (sp == null)
                 return HttpNotFound();
 
-          
-            using (SqlConnection conn = new SqlConnection(connStr))
+            // Lấy tên danh mục
+            using (var conn = new SqlConnection(connStr))
             {
                 string sql = "SELECT TenDM FROM DANHMUC WHERE MaDM=@MaDM";
-                SqlCommand cmd = new SqlCommand(sql, conn);
+                var cmd = new SqlCommand(sql, conn);
+
                 cmd.Parameters.AddWithValue("@MaDM", sp.MaDM);
+
                 conn.Open();
                 var result = cmd.ExecuteScalar();
+
                 if (result != null)
                     tenDanhMuc = result.ToString();
             }
@@ -145,9 +150,5 @@ namespace WebBanVLXD.Controllers
 
             return View(sp);
         }
-
-
-      
-
     }
 }

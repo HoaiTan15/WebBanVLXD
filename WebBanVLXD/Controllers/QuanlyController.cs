@@ -7,22 +7,18 @@ using WebBanVLXD.Models;
 
 namespace WebBanVLXD.Controllers
 {
+    [KiemTraQuyen]
     public class QuanLyController : Controller
     {
         private readonly string connStr = ConfigurationManager.ConnectionStrings["VLXD_DBConnectionString"].ConnectionString;
 
-        // ================== TRANG CHÍNH CỦA QUẢN LÝ ==================
+        // ================== TRANG CHÍNH QUẢN LÝ ==================
         public ActionResult Index()
         {
-            // Kiểm tra vai trò đăng nhập
             if (Session["Role"] == null || Session["Role"].ToString() != "quanly")
-            {
                 return RedirectToAction("Login", "Account");
-            }
 
-            // Gửi cờ IsManager sang View
             ViewBag.IsManager = true;
-
             return View();
         }
 
@@ -34,19 +30,17 @@ namespace WebBanVLXD.Controllers
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 string sql = @"
-            SELECT MaSP, TenSP, DonGia, DonViTinh, SoLuongTon, HinhAnh, MoTa, MaNCC, MaDM
-            FROM SANPHAM
-            WHERE 
-                (@kw IS NULL 
-                 OR MaSP LIKE '%' + @kw + '%'
-                 OR TenSP LIKE '%' + @kw + '%')
-                AND
-                (
-                    @tk = 'all' 
-                    OR (@tk = 'instock' AND SoLuongTon > 0)
-                    OR (@tk = 'outstock' AND SoLuongTon = 0)
-                )
-            ORDER BY SoLuongTon DESC";
+                    SELECT MaSP, TenSP, DonGia, DonViTinh, SoLuongTon, HinhAnh, MoTa, MaNCC, MaDM, TrangThai
+                    FROM SANPHAM
+                    WHERE 
+                        (@kw IS NULL OR MaSP LIKE '%' + @kw + '%' OR TenSP LIKE '%' + @kw + '%')
+                        AND
+                        (
+                            @tk = 'all' 
+                            OR (@tk = 'instock' AND SoLuongTon > 0)
+                            OR (@tk = 'outstock' AND SoLuongTon = 0)
+                        )
+                    ORDER BY SoLuongTon DESC";
 
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@kw", string.IsNullOrEmpty(keyword) ? (object)DBNull.Value : keyword);
@@ -67,12 +61,12 @@ namespace WebBanVLXD.Controllers
                         HinhAnh = rd["HinhAnh"].ToString(),
                         MoTa = rd["MoTa"].ToString(),
                         MaNCC = rd["MaNCC"].ToString(),
-                        MaDM = rd["MaDM"].ToString()
+                        MaDM = rd["MaDM"].ToString(),
+                        TrangThai = rd["TrangThai"] == DBNull.Value ? "" : rd["TrangThai"].ToString()
                     });
                 }
             }
 
-            // Gửi lại các lựa chọn đã chọn
             ViewBag.Keyword = keyword;
             ViewBag.TonKho = tonkho;
 
@@ -85,8 +79,9 @@ namespace WebBanVLXD.Controllers
         {
             using (SqlConnection conn = new SqlConnection(connStr))
             {
-                string sql = "INSERT INTO SANPHAM (TenSP, DonGia, DonViTinh, SoLuongTon, HinhAnh, MoTa, MaNCC, MaDM) " +
-                             "VALUES (@ten, @gia, @dvt, @sl, @hinh, @mota, @ncc, @dm)";
+                string sql = @"INSERT INTO SANPHAM (TenSP, DonGia, DonViTinh, SoLuongTon, HinhAnh, MoTa, MaNCC, MaDM) 
+                               VALUES (@ten, @gia, @dvt, @sl, @hinh, @mota, @ncc, @dm)";
+
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@ten", ten);
                 cmd.Parameters.AddWithValue("@gia", dongia);
@@ -127,7 +122,10 @@ namespace WebBanVLXD.Controllers
         {
             using (SqlConnection conn = new SqlConnection(connStr))
             {
-                string sql = "UPDATE SANPHAM SET TenSP = @ten, DonGia = @gia, SoLuongTon = @sl WHERE MaSP = @ma";
+                string sql = @"UPDATE SANPHAM 
+                               SET TenSP = @ten, DonGia = @gia, SoLuongTon = @sl 
+                               WHERE MaSP = @ma";
+
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@ma", ma);
                 cmd.Parameters.AddWithValue("@ten", ten);
@@ -142,7 +140,7 @@ namespace WebBanVLXD.Controllers
             return RedirectToAction("QLSanPham");
         }
 
-        // ========== DANH SÁCH PHIẾU NHẬP + TÌM KIẾM ==========
+        // ==================== QUẢN LÝ PHIẾU NHẬP ====================
         public ActionResult QLNhapHang(string search)
         {
             List<HOADONNHAPHANG> dsPhieu = new List<HOADONNHAPHANG>();
@@ -150,15 +148,14 @@ namespace WebBanVLXD.Controllers
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 string sql = @"
-            SELECT MaHDN, NgayNhap, TongTien, MaNCC, MaQL 
-            FROM HOADONNHAPHANG
-            WHERE 
-                (@search IS NULL 
-                 OR MaHDN LIKE '%' + @search + '%'
-                 OR MaNCC LIKE '%' + @search + '%'
-                 OR CONVERT(VARCHAR, NgayNhap, 105) LIKE '%' + @search + '%'
-                )
-            ORDER BY NgayNhap DESC";
+                    SELECT MaHDN, NgayNhap, TongTien, MaNCC, MaQL 
+                    FROM HOADONNHAPHANG
+                    WHERE 
+                        (@search IS NULL 
+                         OR MaHDN LIKE '%' + @search + '%'
+                         OR MaNCC LIKE '%' + @search + '%'
+                         OR CONVERT(VARCHAR, NgayNhap, 105) LIKE '%' + @search + '%')
+                    ORDER BY NgayNhap DESC";
 
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@search", string.IsNullOrEmpty(search) ? (object)DBNull.Value : search);
@@ -183,7 +180,7 @@ namespace WebBanVLXD.Controllers
             return View(dsPhieu);
         }
 
-        // ========== TẠO PHIẾU NHẬP ==========
+        // ==================== TẠO PHIẾU NHẬP ====================
         [HttpPost]
         public ActionResult TaoPhieuNhap(string mancc)
         {
@@ -191,10 +188,13 @@ namespace WebBanVLXD.Controllers
 
             using (SqlConnection conn = new SqlConnection(connStr))
             {
-                string sql = "INSERT INTO HOADONNHAPHANG (NgayNhap, TongTien, MaNCC, MaQL) VALUES (GETDATE(), 0, @ncc, @ql)";
+                string sql = @"INSERT INTO HOADONNHAPHANG (NgayNhap, TongTien, MaNCC, MaQL) 
+                               VALUES (GETDATE(), 0, @ncc, @ql)";
+
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@ncc", mancc);
                 cmd.Parameters.AddWithValue("@ql", maQL);
+
                 conn.Open();
                 cmd.ExecuteNonQuery();
             }
@@ -203,22 +203,24 @@ namespace WebBanVLXD.Controllers
             return RedirectToAction("QLNhapHang");
         }
 
-        // ========== XEM CHI TIẾT PHIẾU NHẬP ==========
+        // ==================== CHI TIẾT PHIẾU NHẬP ====================
         public ActionResult ChiTietPhieuNhap(string id)
         {
             if (string.IsNullOrEmpty(id))
                 return RedirectToAction("QLNhapHang");
 
-            id = id.Trim(); // Xử lý khoảng trắng
-
+            id = id.Trim();
             List<PHIEUNHAP> dsCT = new List<PHIEUNHAP>();
+
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 string sql = "SELECT * FROM PHIEUNHAP WHERE MaHDN = @id";
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@id", id);
+
                 conn.Open();
                 SqlDataReader rd = cmd.ExecuteReader();
+
                 while (rd.Read())
                 {
                     dsCT.Add(new PHIEUNHAP
@@ -230,18 +232,20 @@ namespace WebBanVLXD.Controllers
                     });
                 }
             }
+
             ViewBag.MaHDN = id;
             return View(dsCT);
         }
 
-
-        // ========== THÊM SẢN PHẨM VÀO PHIẾU NHẬP ==========
+        // ==================== THÊM CHI TIẾT PHIẾU NHẬP ====================
         [HttpPost]
         public ActionResult ThemChiTiet(string mahdn, string masp, int sl, decimal gianhap)
         {
             using (SqlConnection conn = new SqlConnection(connStr))
             {
-                string sql = "INSERT INTO PHIEUNHAP (MaHDN, MaSP, SoLuong, DonGiaNhap) VALUES (@hdn, @sp, @sl, @gia)";
+                string sql = @"INSERT INTO PHIEUNHAP (MaHDN, MaSP, SoLuong, DonGiaNhap) 
+                               VALUES (@hdn, @sp, @sl, @gia)";
+
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@hdn", mahdn);
                 cmd.Parameters.AddWithValue("@sp", masp);
@@ -256,7 +260,7 @@ namespace WebBanVLXD.Controllers
             return RedirectToAction("ChiTietPhieuNhap", new { id = mahdn });
         }
 
-        // ========== CẬP NHẬT TỔNG TIỀN PHIẾU NHẬP ==========
+        // ==================== CẬP NHẬT TỔNG TIỀN PHIẾU NHẬP ====================
         public ActionResult CapNhatTongTien(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -265,57 +269,47 @@ namespace WebBanVLXD.Controllers
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 conn.Open();
-
-                // Tạo transaction để đảm bảo an toàn dữ liệu
                 SqlTransaction tran = conn.BeginTransaction();
 
                 try
                 {
-                    // 1️⃣ Cập nhật tổng tiền phiếu nhập
-                    string sqlTongTien = @"
-                UPDATE HOADONNHAPHANG
-                SET TongTien = (
-                    SELECT ISNULL(SUM(SoLuong * DonGiaNhap), 0)
-                    FROM PHIEUNHAP
-                    WHERE PHIEUNHAP.MaHDN = HOADONNHAPHANG.MaHDN
-                )
-                WHERE MaHDN = @id";
+                    string sqlTong = @"
+                        UPDATE HOADONNHAPHANG
+                        SET TongTien = (
+                            SELECT ISNULL(SUM(SoLuong * DonGiaNhap), 0)
+                            FROM PHIEUNHAP WHERE MaHDN = @id
+                        )
+                        WHERE MaHDN = @id";
 
-                    SqlCommand cmdTong = new SqlCommand(sqlTongTien, conn, tran);
+                    SqlCommand cmdTong = new SqlCommand(sqlTong, conn, tran);
                     cmdTong.Parameters.AddWithValue("@id", id);
                     cmdTong.ExecuteNonQuery();
 
-                    // 2️⃣ Cập nhật số lượng tồn kho (cộng thêm số lượng nhập)
-                    string sqlUpdateStock = @"
-                UPDATE S
-                SET S.SoLuongTon = S.SoLuongTon + P.SoLuong
-                FROM SANPHAM S
-                INNER JOIN PHIEUNHAP P ON S.MaSP = P.MaSP
-                WHERE P.MaHDN = @id";
+                    string sqlStock = @"
+                        UPDATE S
+                        SET S.SoLuongTon = S.SoLuongTon + P.SoLuong
+                        FROM SANPHAM S 
+                        INNER JOIN PHIEUNHAP P ON S.MaSP = P.MaSP
+                        WHERE P.MaHDN = @id";
 
-                    SqlCommand cmdStock = new SqlCommand(sqlUpdateStock, conn, tran);
+                    SqlCommand cmdStock = new SqlCommand(sqlStock, conn, tran);
                     cmdStock.Parameters.AddWithValue("@id", id);
                     cmdStock.ExecuteNonQuery();
 
-                    // Xác nhận transaction
                     tran.Commit();
-
-                    TempData["ThongBao"] = "✅ Đã cập nhật tổng tiền và tồn kho thành công!";
+                    TempData["ThongBao"] = "Đã cập nhật tổng tiền & tồn kho!";
                 }
                 catch (Exception ex)
                 {
                     tran.Rollback();
-                    TempData["Loi"] = "❌ Lỗi khi cập nhật: " + ex.Message;
+                    TempData["Loi"] = "Lỗi: " + ex.Message;
                 }
             }
 
-            return RedirectToAction("ChiTietPhieuNhap", new { id = id });
+            return RedirectToAction("ChiTietPhieuNhap", new { id });
         }
 
-
-        // =============================
-        // HIỂN THỊ QUẢN LÝ TỒN KHO
-        // =============================
+        // ==================== QUẢN LÝ TỒN KHO ====================
         public ActionResult QLTonKho()
         {
             List<SANPHAM> dsSP = new List<SANPHAM>();
@@ -324,8 +318,10 @@ namespace WebBanVLXD.Controllers
             {
                 string sql = "SELECT MaSP, TenSP, DonViTinh, SoLuongTon FROM SANPHAM";
                 SqlCommand cmd = new SqlCommand(sql, conn);
+
                 conn.Open();
                 SqlDataReader rd = cmd.ExecuteReader();
+
                 while (rd.Read())
                 {
                     dsSP.Add(new SANPHAM
@@ -338,13 +334,10 @@ namespace WebBanVLXD.Controllers
                 }
             }
 
-            return View("QLTonKho", dsSP);
+            return View(dsSP);
         }
 
-
-        // ===============================
-        // BÁO CÁO DOANH THU
-        // ===============================
+        // ==================== BÁO CÁO DOANH THU ====================
         public ActionResult BaoCaoDoanhThu()
         {
             List<BaoCaoDoanhThu> dsBC = new List<BaoCaoDoanhThu>();
@@ -352,20 +345,21 @@ namespace WebBanVLXD.Controllers
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 string sql = @"
-            SELECT 
-                CONVERT(DATE, NgayLap) AS Ngay,
-                SUM(TongTien) AS TongBan,
-                ISNULL((
-                    SELECT SUM(TongTien) 
-                    FROM HOADONNHAPHANG HN 
-                    WHERE CONVERT(DATE, HN.NgayNhap) = CONVERT(DATE, HD.NgayLap)
-                ), 0) AS TongNhap
-            FROM HOADON HD
-            WHERE TrangThai = N'Đã thanh toán'
-            GROUP BY CONVERT(DATE, NgayLap)
-            ORDER BY NgayLap DESC";
+                    SELECT 
+                        CONVERT(DATE, NgayLap) AS Ngay,
+                        SUM(TongTien) AS TongBan,
+                        ISNULL((
+                            SELECT SUM(TongTien) 
+                            FROM HOADONNHAPHANG HN 
+                            WHERE CONVERT(DATE, HN.NgayNhap) = CONVERT(DATE, HD.NgayLap)
+                        ),0) AS TongNhap
+                    FROM HOADON HD
+                    WHERE TrangThai = N'Đã thanh toán'
+                    GROUP BY CONVERT(DATE, NgayLap)
+                    ORDER BY NgayLap DESC";
 
                 SqlCommand cmd = new SqlCommand(sql, conn);
+
                 conn.Open();
                 SqlDataReader rd = cmd.ExecuteReader();
 
@@ -384,6 +378,7 @@ namespace WebBanVLXD.Controllers
             return View(dsBC);
         }
 
+        // ==================== QUẢN LÝ ĐƠN HÀNG ====================
         public ActionResult QLDonHang()
         {
             List<HOADON> ds = new List<HOADON>();
@@ -391,13 +386,13 @@ namespace WebBanVLXD.Controllers
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 string sql = @"SELECT MaHD, NgayLap, TongTien, TrangThai, PhuongThucTT, MaKH
-                       FROM HOADON
-                       ORDER BY NgayLap DESC";
+                               FROM HOADON
+                               ORDER BY NgayLap DESC";
 
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 conn.Open();
-                SqlDataReader rd = cmd.ExecuteReader();
 
+                var rd = cmd.ExecuteReader();
                 while (rd.Read())
                 {
                     ds.Add(new HOADON
@@ -415,35 +410,32 @@ namespace WebBanVLXD.Controllers
             return View(ds);
         }
 
+        // ==================== CHI TIẾT ĐƠN HÀNG ====================
         public ActionResult ChiTietDonHang(string id)
         {
             if (string.IsNullOrEmpty(id))
                 return RedirectToAction("QLDonHang");
 
-            id = id.Trim(); // xử lý khoảng trắng
+            id = id.Trim();
 
-            // Model chứa thông tin hóa đơn
             HOADON hoaDon = null;
-
-            // Danh sách chi tiết sản phẩm
             List<Dictionary<string, object>> chiTiet = new List<Dictionary<string, object>>();
 
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 conn.Open();
 
-                // ===== LẤY THÔNG TIN HÓA ĐƠN =====
                 string sqlHD = @"
-            SELECT HD.MaHD, HD.NgayLap, HD.TongTien, HD.TrangThai, HD.PhuongThucTT,
-                   ND.TenNguoiDung, ND.Email, ND.SDT, ND.DiaChi
-            FROM HOADON HD
-            JOIN NGUOIDUNG ND ON HD.MaKH = ND.MaUser
-            WHERE HD.MaHD = @id";
+                    SELECT HD.MaHD, HD.NgayLap, HD.TongTien, HD.TrangThai, HD.PhuongThucTT,
+                           ND.TenNguoiDung, ND.Email, ND.SDT, ND.DiaChi
+                    FROM HOADON HD
+                    JOIN NGUOIDUNG ND ON HD.MaKH = ND.MaUser
+                    WHERE HD.MaHD = @id";
 
                 SqlCommand cmdHD = new SqlCommand(sqlHD, conn);
                 cmdHD.Parameters.AddWithValue("@id", id);
 
-                SqlDataReader rdHD = cmdHD.ExecuteReader();
+                var rdHD = cmdHD.ExecuteReader();
                 if (rdHD.Read())
                 {
                     hoaDon = new HOADON
@@ -461,27 +453,27 @@ namespace WebBanVLXD.Controllers
                 }
                 rdHD.Close();
 
-                // ===== LẤY CHI TIẾT SẢN PHẨM =====
                 string sqlCT = @"
-            SELECT C.MaSP, S.TenSP, C.SoLuong, C.DonGia,
-                   (C.SoLuong * C.DonGia) AS ThanhTien
-            FROM CTHOADON C
-            JOIN SANPHAM S ON C.MaSP = S.MaSP
-            WHERE C.MaHD = @MaHD";
+                    SELECT C.MaSP, S.TenSP, C.SoLuong, C.DonGia,
+                           (C.SoLuong * C.DonGia) AS ThanhTien
+                    FROM CTHOADON C
+                    JOIN SANPHAM S ON C.MaSP = S.MaSP
+                    WHERE C.MaHD = @MaHD";
 
                 SqlCommand cmdCT = new SqlCommand(sqlCT, conn);
                 cmdCT.Parameters.AddWithValue("@MaHD", id);
 
-                SqlDataReader rdCT = cmdCT.ExecuteReader();
+                var rdCT = cmdCT.ExecuteReader();
                 while (rdCT.Read())
                 {
-                    var item = new Dictionary<string, object>();
-                    item["MaSP"] = rdCT["MaSP"].ToString();
-                    item["TenSP"] = rdCT["TenSP"].ToString();
-                    item["SoLuong"] = rdCT["SoLuong"];
-                    item["DonGia"] = Convert.ToDecimal(rdCT["DonGia"]).ToString("N0") + " đ";
-                    item["ThanhTien"] = Convert.ToDecimal(rdCT["ThanhTien"]).ToString("N0") + " đ";
-                    chiTiet.Add(item);
+                    chiTiet.Add(new Dictionary<string, object>
+                    {
+                        { "MaSP", rdCT["MaSP"].ToString() },
+                        { "TenSP", rdCT["TenSP"].ToString() },
+                        { "SoLuong", rdCT["SoLuong"] },
+                        { "DonGia", Convert.ToDecimal(rdCT["DonGia"]).ToString("N0") + " đ" },
+                        { "ThanhTien", Convert.ToDecimal(rdCT["ThanhTien"]).ToString("N0") + " đ" }
+                    });
                 }
             }
 
@@ -489,5 +481,56 @@ namespace WebBanVLXD.Controllers
             return View(chiTiet);
         }
 
+        // ==================== NGỪNG KINH DOANH ====================
+        [HttpPost]
+        public ActionResult NgungKinhDoanh(string ma)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connStr))
+                {
+                    string sql = "UPDATE SANPHAM SET TrangThai = N'NgungKinhDoanh' WHERE MaSP = @ma";
+                    SqlCommand cmd = new SqlCommand(sql, conn);
+                    cmd.Parameters.AddWithValue("@ma", ma.Trim());
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+
+                TempData["ThongBao"] = "Đã ngừng kinh doanh sản phẩm!";
+            }
+            catch (Exception ex)
+            {
+                TempData["ThongBao"] = "Lỗi: " + ex.Message;
+            }
+
+            return RedirectToAction("QLSanPham");
+        }
+
+        // ==================== MỞ BÁN LẠI ====================
+        [HttpPost]
+        public ActionResult KinhDoanhLai(string ma)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connStr))
+                {
+                    string sql = "UPDATE SANPHAM SET TrangThai = NULL WHERE MaSP = @ma";
+                    SqlCommand cmd = new SqlCommand(sql, conn);
+                    cmd.Parameters.AddWithValue("@ma", ma.Trim());
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+
+                TempData["ThongBao"] = "Đã mở bán lại sản phẩm!";
+            }
+            catch (Exception ex)
+            {
+                TempData["ThongBao"] = "Lỗi: " + ex.Message;
+            }
+
+            return RedirectToAction("QLSanPham");
+        }
     }
 }

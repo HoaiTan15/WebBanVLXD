@@ -98,11 +98,14 @@
                         hiddenQty.value = qtyInput.value;
                     });
                 </script>
+                <form method="post" action="@Url.Action("MuaNgay", "KhachHang")">
+                    <input type="hidden" name="MaSP" value="@Model.MaSP" />
+                    <input type="hidden" id="BuyNowQty" name="SoLuong" value="1" />
 
-
-                <button class="btn btn-danger px-4">
-                    Mua ngay
-                </button>
+                    <button type="submit" class="btn btn-danger px-4">
+                        Mua ngay
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -127,6 +130,22 @@
 
     qty.addEventListener("input", () => hiddenQty.value = qty.value);
 </script>
+<script>
+    const buyNowQty = document.getElementById("BuyNowQty");
+
+    qtyInput.addEventListener("input", () => {
+        buyNowQty.value = qtyInput.value;
+    });
+
+    plusBtn.addEventListener("click", () => {
+        buyNowQty.value = qtyInput.value;
+    });
+
+    minusBtn.addEventListener("click", () => {
+        buyNowQty.value = qtyInput.value;
+    });
+</script>
+
 
 <style>
     .breadcrumb {
@@ -149,6 +168,7 @@
         color: #999;
         margin: 0 6px;
     }
+
     body {
         background: #f5f7fa;
     }
@@ -184,5 +204,4 @@
     input[type=number] {
         -moz-appearance: textfield;
     }
-
 </style>

@@ -25,7 +25,7 @@
             <h5 class="card-title text-success mb-3"><i class="fa fa-plus-circle"></i> Thêm sản phẩm mới</h5>
 
             <form method="post" action="@Url.Action("ThemSanPham", "Admin")" enctype="multipart/form-data" class="row g-3">
-               
+
                 <div class="col-md-3">
                     <input name="ten" class="form-control" placeholder="Tên sản phẩm" required />
                 </div>
@@ -59,10 +59,30 @@
         </div>
     </div>
 
+    <!-- FORM LỌC -->
+    <form method="get" action="@Url.Action("QLSanPham", "Admin")" class="d-flex mb-3">
+        <input type="text"
+               name="keyword"
+               value="@ViewBag.Keyword"
+               class="form-control w-25 me-2"
+               placeholder="Tìm theo mã hoặc tên sản phẩm...">
+
+        <select name="tonkho" class="form-control w-25 me-2">
+            <option value="all" @(ViewBag.TonKho == "all" || ViewBag.TonKho == null ? "selected" : "")>Tất cả</option>
+            <option value="instock" @(ViewBag.TonKho == "instock" ? "selected" : "")>Còn hàng (Tồn > 0)</option>
+            <option value="outstock" @(ViewBag.TonKho == "outstock" ? "selected" : "")>Hết hàng (Tồn = 0)</option>
+        </select>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="fa fa-search"></i> Lọc
+        </button>
+    </form>
+
     <!-- Danh sách sản phẩm -->
     <table class="table table-bordered table-hover align-middle shadow-sm">
         <thead class="table-dark">
             <tr>
+                <th>Mã SP</th>
                 <th>Tên sản phẩm</th>
                 <th>Đơn giá</th>
                 <th>Đơn vị</th>
@@ -79,6 +99,7 @@
             @foreach (var sp in Model)
             {
                 <tr>
+                    <td><strong>@sp.MaSP</strong></td>
                     <td>@sp.TenSP</td>
                     <td>@String.Format("{0:N0} đ", sp.DonGia)</td>
                     <td>@sp.DonViTinh</td>

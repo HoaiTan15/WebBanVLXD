@@ -17,14 +17,14 @@ namespace WebBanVLXD.Controllers
         private static readonly ObjectCache TokenCache = MemoryCache.Default;
         private const int TokenExpirationHours = 1;
 
-        // ===========================================================
-        //                      LOGIN
-        // ===========================================================
-
+        // ===========================
+        // LOGIN
+        // ===========================
         public ActionResult Login()
         {
             if (TempData["ResetSuccess"] != null)
                 ViewBag.ResetSuccess = TempData["ResetSuccess"];
+
             return View();
         }
 
@@ -36,10 +36,10 @@ namespace WebBanVLXD.Controllers
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 string sql = @"SELECT MaUser, TenNguoiDung, Role, TrangThai 
-                              FROM NGUOIDUNG
-                              WHERE Email = @Email AND MatKhau = @MatKhau";
-        
-        SqlCommand cmd = new SqlCommand(sql, conn);
+                               FROM NGUOIDUNG
+                               WHERE Email = @Email AND MatKhau = @MatKhau";
+
+                SqlCommand cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@Email", Email);
                 cmd.Parameters.AddWithValue("@MatKhau", MatKhau);
 
@@ -64,13 +64,11 @@ namespace WebBanVLXD.Controllers
                 return View();
             }
 
-            // ❌ Bị khóa
             if (user.TrangThai != null && user.TrangThai.Trim().ToLower() == "khoa")
             {
                 ViewBag.Error = "Tài khoản của bạn đã bị khóa!";
                 return View();
             }
-
 
             Session["UserID"] = user.MaUser;
             Session["UserName"] = user.TenNguoiDung;
@@ -79,17 +77,15 @@ namespace WebBanVLXD.Controllers
             return RedirectToAction("Index", "SanPham");
         }
 
-
         public ActionResult Logout()
         {
             Session.Clear();
             return RedirectToAction("Login");
         }
 
-        // ===========================================================
+        // ===========================
         // REGISTER
-        // ===========================================================
-
+        // ===========================
         public ActionResult Register()
         {
             return View();
@@ -99,7 +95,6 @@ namespace WebBanVLXD.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Register(string TenNguoiDung, string Email, string MatKhau, string XacNhan, string SDT, string DiaChi)
         {
-            // Validate
             if (string.IsNullOrWhiteSpace(TenNguoiDung))
                 ModelState.AddModelError("TenNguoiDung", "Họ tên là bắt buộc.");
             if (string.IsNullOrWhiteSpace(Email))
@@ -118,8 +113,8 @@ namespace WebBanVLXD.Controllers
                 string check = "SELECT COUNT(*) FROM NGUOIDUNG WHERE Email=@Email";
                 SqlCommand cmd = new SqlCommand(check, conn);
                 cmd.Parameters.AddWithValue("@Email", Email);
-                conn.Open();
 
+                conn.Open();
                 if ((int)cmd.ExecuteScalar() > 0)
                 {
                     ModelState.AddModelError("Email", "Email đã được sử dụng.");
@@ -127,23 +122,24 @@ namespace WebBanVLXD.Controllers
                 }
             }
 
-            // Tạo mã User tự động
+            // Tạo mã user tự động
             string maUser;
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 string q = "SELECT COUNT(*) FROM NGUOIDUNG";
                 SqlCommand cmd = new SqlCommand(q, conn);
+
                 conn.Open();
                 int count = (int)cmd.ExecuteScalar() + 1;
                 maUser = "US" + count.ToString("D4");
             }
 
-            // Thêm user
+            // Thêm user mới
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 string sql = @"INSERT INTO NGUOIDUNG 
                                 (MaUser, TenNguoiDung, MatKhau, Email, SDT, DiaChi, Role, TrangThai, NgayTao)
-                               VALUES
+                                VALUES
                                 (@MaUser, @TenNguoiDung, @MatKhau, @Email, @SDT, @DiaChi, 'khach', 'HoatDong', GETDATE())";
 
                 SqlCommand cmd = new SqlCommand(sql, conn);
@@ -152,11 +148,8 @@ namespace WebBanVLXD.Controllers
                 cmd.Parameters.AddWithValue("@TenNguoiDung", TenNguoiDung);
                 cmd.Parameters.AddWithValue("@MatKhau", MatKhau);
                 cmd.Parameters.AddWithValue("@Email", Email);
-
-                // Cho phép null
                 cmd.Parameters.AddWithValue("@SDT",
                     string.IsNullOrWhiteSpace(SDT) ? (object)DBNull.Value : SDT);
-
                 cmd.Parameters.AddWithValue("@DiaChi",
                     string.IsNullOrWhiteSpace(DiaChi) ? (object)DBNull.Value : DiaChi);
 
@@ -168,10 +161,9 @@ namespace WebBanVLXD.Controllers
             return RedirectToAction("Login");
         }
 
-        // ===========================================================
-        // SEND OTP
-        // ===========================================================
-
+        // ===========================
+        // SEND OTP (Forgot Password)
+        // ===========================
         [HttpPost]
         public JsonResult SendOtp()
         {
@@ -202,6 +194,7 @@ namespace WebBanVLXD.Controllers
                     string sql = "SELECT TenNguoiDung FROM NGUOIDUNG WHERE Email=@Email AND TrangThai='HoatDong'";
                     SqlCommand cmd = new SqlCommand(sql, conn);
                     cmd.Parameters.AddWithValue("@Email", email);
+
                     conn.Open();
                     var result = cmd.ExecuteScalar();
                     if (result != null) ten = result.ToString();
@@ -215,9 +208,8 @@ namespace WebBanVLXD.Controllers
                 TokenCache.Set($"otp:{email.ToLower()}", otp,
                     new CacheItemPolicy { AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(10) });
 
-                // Gửi email
-                string html = $"Xin chào {ten},<br/>Mã OTP: <b>{otp}</b>";
-                SendEmail(email, "Mã OTP - Đổi mật khẩu", html);
+                SendEmail(email, "Mã OTP - Đổi mật khẩu",
+                    $"Xin chào {ten},<br/>Mã OTP của bạn là: <b>{otp}</b>");
 
                 return Json(new { success = true, message = "Đã gửi OTP!" });
             }
@@ -227,10 +219,9 @@ namespace WebBanVLXD.Controllers
             }
         }
 
-        // ===========================================================
+        // ===========================
         // VERIFY OTP
-        // ===========================================================
-
+        // ===========================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult VerifyOtp(string Email, string Otp)
@@ -254,6 +245,7 @@ namespace WebBanVLXD.Controllers
                 string sql = "SELECT MaUser FROM NGUOIDUNG WHERE Email=@Email AND TrangThai='HoatDong'";
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@Email", Email);
+
                 conn.Open();
                 maUser = cmd.ExecuteScalar()?.ToString();
             }
@@ -273,10 +265,9 @@ namespace WebBanVLXD.Controllers
             return RedirectToAction("ResetPassword", new { token = resetToken });
         }
 
-        // ===========================================================
+        // ===========================
         // RESET PASSWORD
-        // ===========================================================
-
+        // ===========================
         public ActionResult ResetPassword(string token)
         {
             if (string.IsNullOrEmpty(token) || !TokenCache.Contains(token))
@@ -307,8 +298,10 @@ namespace WebBanVLXD.Controllers
             {
                 string sql = "UPDATE NGUOIDUNG SET MatKhau=@MatKhau WHERE MaUser=@MaUser";
                 SqlCommand cmd = new SqlCommand(sql, conn);
+
                 cmd.Parameters.AddWithValue("@MatKhau", model.MatKhauMoi);
                 cmd.Parameters.AddWithValue("@MaUser", maUser);
+
                 conn.Open();
                 cmd.ExecuteNonQuery();
             }
@@ -318,10 +311,9 @@ namespace WebBanVLXD.Controllers
             return RedirectToAction("Login");
         }
 
-        // ===========================================================
-        // GỬI EMAIL
-        // ===========================================================
-
+        // ===========================
+        // SEND EMAIL (Internal)
+        // ===========================
         private void SendEmail(string toEmail, string subject, string bodyHtml)
         {
             var smtp = ConfigurationManager.GetSection("system.net/mailSettings/smtp")
@@ -338,10 +330,9 @@ namespace WebBanVLXD.Controllers
             }
         }
 
-        // ===========================================================
-        // XEM THÔNG TIN
-        // ===========================================================
-
+        // ===========================
+        // VIEW PROFILE
+        // ===========================
         public ActionResult ThongTin()
         {
             if (Session["UserID"] == null)
@@ -354,10 +345,12 @@ namespace WebBanVLXD.Controllers
             {
                 string sql = "SELECT * FROM NGUOIDUNG WHERE MaUser=@MaUser";
                 SqlCommand cmd = new SqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@MaUser", maUser);
-                conn.Open();
 
+                cmd.Parameters.AddWithValue("@MaUser", maUser);
+
+                conn.Open();
                 var rd = cmd.ExecuteReader();
+
                 if (rd.Read())
                 {
                     user = new NGUOIDUNG
@@ -375,10 +368,9 @@ namespace WebBanVLXD.Controllers
             return View(user);
         }
 
-        // ===========================================================
-        // SỬA THÔNG TIN
-        // ===========================================================
-
+        // ===========================
+        // EDIT PROFILE
+        // ===========================
         public ActionResult SuaThongTin()
         {
             if (Session["UserID"] == null)
@@ -391,10 +383,12 @@ namespace WebBanVLXD.Controllers
             {
                 string sql = "SELECT * FROM NGUOIDUNG WHERE MaUser=@MaUser";
                 SqlCommand cmd = new SqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@MaUser", maUser);
-                conn.Open();
 
+                cmd.Parameters.AddWithValue("@MaUser", maUser);
+
+                conn.Open();
                 var rd = cmd.ExecuteReader();
+
                 if (rd.Read())
                 {
                     user = new NGUOIDUNG
@@ -433,13 +427,10 @@ namespace WebBanVLXD.Controllers
                 SqlCommand cmd = new SqlCommand(sql, conn);
 
                 cmd.Parameters.AddWithValue("@TenNguoiDung", model.TenNguoiDung);
-
                 cmd.Parameters.AddWithValue("@SDT",
                     string.IsNullOrWhiteSpace(model.SDT) ? (object)DBNull.Value : model.SDT);
-
                 cmd.Parameters.AddWithValue("@DiaChi",
                     string.IsNullOrWhiteSpace(model.DiaChi) ? (object)DBNull.Value : model.DiaChi);
-
                 cmd.Parameters.AddWithValue("@MaUser", model.MaUser);
 
                 conn.Open();

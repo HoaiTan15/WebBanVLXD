@@ -22,24 +22,6 @@
     </div>
 }
 
-<!-- ========================= DANH MỤC ========================= -->
-<div class="container mt-5">
-    <h5 class="fw-bold mb-3 text-uppercase text-center">Danh mục</h5>
-    <div class="row row-cols-2 row-cols-md-4 g-4 justify-content-center">
-        @foreach (var dm in danhMucs)
-        {
-            <div class="col text-center">
-                <a href="@Url.Action("Index","SanPham", new { madm = dm.MaDM })"
-                   class="text-decoration-none text-dark">
-                    <div class="category-card p-3 border rounded-3 bg-white hover-shadow-sm">
-                        <img src="~/@dm.HinhAnh" class="category-img" />
-                        <div class="category-name mt-2">@dm.TenDM</div>
-                    </div>
-                </a>
-            </div>
-        }
-    </div>
-</div>
 
 
 <!-- ========================== QUẢN LÝ ========================== -->
@@ -63,6 +45,24 @@
     </div>
 }
 
+<!-- ========================= DANH MỤC ========================= -->
+<div class="container mt-5">
+    <h5 class="fw-bold mb-3 text-uppercase text-center">Danh mục</h5>
+    <div class="row row-cols-2 row-cols-md-4 g-4 justify-content-center">
+        @foreach (var dm in danhMucs)
+        {
+            <div class="col text-center">
+                <a href="@Url.Action("Index","SanPham", new { madm = dm.MaDM })"
+                   class="text-decoration-none text-dark">
+                    <div class="category-card p-3 border rounded-3 bg-white hover-shadow-sm">
+                        <img src="~/@dm.HinhAnh" class="category-img" />
+                        <div class="category-name mt-2">@dm.TenDM</div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>
 <!-- ========================== SORT + SẢN PHẨM ========================== -->
 <div class="container mt-5">
 

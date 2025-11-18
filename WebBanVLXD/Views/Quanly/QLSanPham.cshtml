@@ -4,6 +4,19 @@
     Layout = "~/Views/Shared/_LayoutShop.cshtml";
 }
 
+<div class="container mt-4 mb-4">
+    <div class="alert alert-success shadow-sm">
+        <h4><i class="fa fa-briefcase"></i> Bảng điều khiển quản lý</h4>
+        <div class="d-flex flex-wrap gap-2 mt-3">
+            <a href="@Url.Action("QLSanPham","QuanLy")" class="btn btn-primary"><i class="fa fa-box"></i> Quản lý sản phẩm</a>
+            <a href="@Url.Action("QLNhapHang","QuanLy")" class="btn btn-success"><i class="fa fa-download"></i> Nhập hàng</a>
+            <a href="@Url.Action("QLTonKho","QuanLy")" class="btn btn-info text-white"><i class="fa fa-cubes"></i> Tồn kho</a>
+            <a href="@Url.Action("BaoCaoDoanhThu","QuanLy")" class="btn btn-danger"><i class="fa fa-bar-chart"></i> Báo cáo</a>
+            <a href="@Url.Action("QLDonHang","QuanLy")" class="btn btn-primary btn-lg"><i class="fa fa-box"></i> Đơn hàng</a>
+        </div>
+    </div>
+</div>
+
 <div class="container mt-4">
     <h3 class="mb-4 text-primary"><i class="fa fa-box"></i> Quản lý sản phẩm</h3>
 
@@ -12,17 +25,17 @@
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <i class="fa fa-check-circle"></i> @TempData["ThongBao"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
 
     <!-- FORM THÊM SẢN PHẨM -->
-    <form action="@Url.Action("ThemSanPham", "QuanLy")" method="post" class="row g-2 mb-4 border p-3 rounded shadow-sm">
+    <form action="@Url.Action("ThemSanPham", "QuanLy")" method="post" class="row g-2 mb-4 border p-3 rounded shadow-sm" enctype="multipart/form-data">
         <div class="col-md-3">
             <input type="text" name="ten" class="form-control" placeholder="Tên sản phẩm" required />
         </div>
         <div class="col-md-2">
-            <input type="number" step="1000" name="dongia" class="form-control" placeholder="Đơn giá" required />
+            <input type="number" step="1" name="dongia" class="form-control" placeholder="Đơn giá" required />
         </div>
         <div class="col-md-2">
             <input type="text" name="dvt" class="form-control" placeholder="Đơn vị tính" required />
@@ -49,6 +62,7 @@
         </div>
     </form>
 
+    <!-- FORM LỌC -->
     <form method="get" action="@Url.Action("QLSanPham", "QuanLy")" class="d-flex mb-3">
 
         <input type="text"
@@ -68,7 +82,6 @@
         </button>
     </form>
 
-
     <!-- DANH SÁCH SẢN PHẨM -->
     <table class="table table-bordered table-hover shadow-sm align-middle">
         <thead class="table-light text-center">
@@ -78,7 +91,8 @@
                 <th style="width: 10%">Đơn giá</th>
                 <th style="width: 8%">Tồn kho</th>
                 <th style="width: 10%">Hình ảnh</th>
-                <th style="width: 28%">Mô tả</th>
+                <th style="width: 20%">Mô tả</th>
+                <th style="width: 8%">Trạng thái</th>
                 <th style="width: 18%">Thao tác</th>
             </tr>
         </thead>
@@ -86,40 +100,133 @@
             @foreach (var sp in Model)
             {
                 <tr>
-                    <form action="@Url.Action("CapNhatSanPham", "QuanLy")" method="post">
                     <td class="text-center">
-                        <input type="hidden" name="ma" value="@sp.MaSP" />
                         <strong>@sp.MaSP</strong>
                     </td>
+
+                    <!-- Tên sản phẩm -->
                     <td>
-                        <input type="text" name="ten" value="@sp.TenSP" class="form-control form-control-sm" />
+                        <input type="text" id="ten_@sp.MaSP" value="@sp.TenSP" class="form-control form-control-sm" />
                     </td>
+
+                    <!-- Đơn giá -->
                     <td>
-                        <input type="number" step="1000" name="dongia" value="@sp.DonGia" class="form-control form-control-sm" />
+                        <input type="number" step="1" id="dongia_@sp.MaSP" value="@sp.DonGia" class="form-control form-control-sm" />
                     </td>
+
+                    <!-- Tồn kho -->
                     <td>
-                        <input type="number" name="sl" value="@sp.SoLuongTon" class="form-control form-control-sm" />
+                        <input type="number" id="sl_@sp.MaSP" value="@sp.SoLuongTon" class="form-control form-control-sm" />
                     </td>
+
+                    <!-- Hình ảnh -->
                     <td class="text-center">
                         <img src="~/@sp.HinhAnh" width="60" height="60" class="rounded border" />
                     </td>
+
+                    <!-- Mô tả -->
                     <td>@sp.MoTa</td>
+
+                    <!-- TRẠNG THÁI -->
                     <td class="text-center">
-                        <button type="submit" class="btn btn-sm btn-primary mb-1 w-100">
+                        @if (sp.TrangThai == "NgungKinhDoanh")
+                        {
+                            <span class="badge bg-danger">Ngừng KD</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">Đang bán</span>
+                        }
+                    </td>
+
+                    <!-- Thao tác -->
+                    <td class="text-center">
+                        <button type="button" onclick="submitCapNhat('@sp.MaSP')" class="btn btn-sm btn-primary w-100 mb-1">
                             <i class="fa fa-save"></i> Cập nhật
                         </button>
 
-                        <form action="@Url.Action("XoaSanPham", "QuanLy")" method="post" style="display:inline">
-                            <input type="hidden" name="ma" value="@sp.MaSP" />
-                            <button type="submit" class="btn btn-sm btn-danger w-100"
-                                    onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này không?')">
-                                <i class="fa fa-trash"></i> Xóa
+                        <!-- NÚT NGỪNG KINH DOANH / KINH DOANH LẠI -->
+                        @if (sp.TrangThai == "NgungKinhDoanh")
+                        {
+                            <!-- KINH DOANH LẠI -->
+                            <button type="button" class="btn btn-sm btn-success w-100" onclick="submitKinhDoanhLai('@sp.MaSP')">
+                                <i class="fa fa-undo"></i> Kinh doanh lại
                             </button>
-                        </form>
+                        }
+                        else
+                        {
+                            <!-- NGỪNG KINH DOANH -->
+                            <button type="button" class="btn btn-sm btn-danger w-100" onclick="submitNgungKinhDoanh('@sp.MaSP')">
+                                <i class="fa fa-ban"></i> Ngừng KD
+                            </button>
+                        }
                     </td>
-                    </form>
                 </tr>
             }
         </tbody>
     </table>
 </div>
+
+<script>
+function submitCapNhat(ma) {
+    var f = document.createElement('form');
+    f.method = 'post';
+    f.action = '@Url.Action("CapNhatSanPham","QuanLy")';
+    f.enctype = 'multipart/form-data';
+
+    var inputMa = document.createElement('input');
+    inputMa.type = 'hidden';
+    inputMa.name = 'ma';
+    inputMa.value = ma;
+    f.appendChild(inputMa);
+
+    var inputTen = document.createElement('input');
+    inputTen.type = 'hidden';
+    inputTen.name = 'ten';
+    inputTen.value = document.getElementById('ten_' + ma).value;
+    f.appendChild(inputTen);
+
+    var inputDonGia = document.createElement('input');
+    inputDonGia.type = 'hidden';
+    inputDonGia.name = 'dongia';
+    inputDonGia.value = document.getElementById('dongia_' + ma).value;
+    f.appendChild(inputDonGia);
+
+    var inputSL = document.createElement('input');
+    inputSL.type = 'hidden';
+    inputSL.name = 'sl';
+    inputSL.value = document.getElementById('sl_' + ma).value;
+    f.appendChild(inputSL);
+
+    document.body.appendChild(f);
+    f.submit();
+}
+
+function submitNgungKinhDoanh(ma) {
+    if (!confirm('Bạn chắc chắn muốn NGỪNG bán sản phẩm này?')) return;
+    var f = document.createElement('form');
+    f.method = 'post';
+    f.action = '@Url.Action("NgungKinhDoanh","QuanLy")';
+    var i = document.createElement('input');
+    i.type = 'hidden';
+    i.name = 'ma';
+    i.value = ma;
+    f.appendChild(i);
+    document.body.appendChild(f);
+    f.submit();
+}
+
+function submitKinhDoanhLai(ma) {
+    if (!confirm('Bạn muốn mở bán lại sản phẩm này?')) return;
+    var f = document.createElement('form');
+    f.method = 'post';
+    f.action = '@Url.Action("KinhDoanhLai","QuanLy")';
+    var i = document.createElement('input');
+    i.type = 'hidden';
+    i.name = 'ma';
+    i.value = ma;
+    f.appendChild(i);
+    document.body.appendChild(f);
+    f.submit();
+}
+</script>

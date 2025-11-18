@@ -2,8 +2,22 @@
 @{
     ViewBag.Title = "Báo cáo doanh thu";
     Layout = "~/Views/Shared/_LayoutShop.cshtml";
+    var tongBan = Model.Sum(x => x.TongBan);
+    var tongNhap = Model.Sum(x => x.TongNhap);
+    var tongLoiNhuan = Model.Sum(x => x.LoiNhuan);
 }
-
+<div class="container mt-4 mb-4">
+    <div class="alert alert-success shadow-sm">
+        <h4><i class="fa fa-briefcase"></i> Bảng điều khiển quản lý</h4>
+        <div class="d-flex flex-wrap gap-2 mt-3">
+            <a href="@Url.Action("QLSanPham","QuanLy")" class="btn btn-primary"><i class="fa fa-box"></i> Quản lý sản phẩm</a>
+            <a href="@Url.Action("QLNhapHang","QuanLy")" class="btn btn-success"><i class="fa fa-download"></i> Nhập hàng</a>
+            <a href="@Url.Action("QLTonKho","QuanLy")" class="btn btn-info text-white"><i class="fa fa-cubes"></i> Tồn kho</a>
+            <a href="@Url.Action("BaoCaoDoanhThu","QuanLy")" class="btn btn-danger"><i class="fa fa-bar-chart"></i> Báo cáo</a>
+            <a href="@Url.Action("QLDonHang","QuanLy")" class="btn btn-primary btn-lg"><i class="fa fa-box"></i> Đơn hàng</a>
+        </div>
+    </div>
+</div>
 <div class="container mt-4">
     <h3 class="text-primary"><i class="fa fa-line-chart"></i> Báo cáo doanh thu</h3>
     <hr />
@@ -27,6 +41,14 @@
                     <td class="fw-bold text-success">@string.Format("{0:N0} ₫", bc.LoiNhuan)</td>
                 </tr>
             }
+        <tfoot>
+            <tr class="table-warning fw-bold">
+                <td>TỔNG</td>
+                <td>@string.Format("{0:N0} ₫", tongBan)</td>
+                <td>@string.Format("{0:N0} ₫", tongNhap)</td>
+                <td>@string.Format("{0:N0} ₫", tongLoiNhuan)</td>
+            </tr>
+        </tfoot>
         </tbody>
     </table>
 

@@ -2,7 +2,7 @@
 @{
     Layout = "~/Views/Shared/_LayoutShop.cshtml";
     ViewBag.Title = "Xác nhận đơn hàng";
-    decimal tong = Model.Sum(x => x.DonGia * x.SoLuongTon);
+    decimal tong = Model.Sum(x => x.DonGia * x.SoLuongMua);
 }
 
 <div class="container mt-5">

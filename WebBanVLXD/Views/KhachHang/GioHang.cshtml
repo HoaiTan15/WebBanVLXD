@@ -2,25 +2,20 @@
 @{
     Layout = "~/Views/Shared/_LayoutShop.cshtml";
     ViewBag.Title = "Giỏ hàng";
-    decimal tong = Model.Sum(x => x.DonGia * x.SoLuongTon);
+    decimal tong = Model.Sum(x => x.DonGia * x.SoLuongMua);
 }
-
 <div class="container mt-5">
-
     <!-- HIỂN THỊ THÔNG BÁO -->
     @if (TempData["Loi"] != null)
     {
         <div class="alert alert-danger text-center fw-bold">@TempData["Loi"]</div>
     }
-
     @if (TempData["ThongBao"] != null)
     {
         <div class="alert alert-success text-center fw-bold">@TempData["ThongBao"]</div>
     }
     <!-- ===================== -->
-
     <h4 class="text-center fw-bold mb-4">🛒 Giỏ hàng của bạn</h4>
-
     @if (!Model.Any())
     {
         <div class="alert alert-warning text-center">Giỏ hàng hiện đang trống!</div>
@@ -50,9 +45,11 @@
                                 <input type="hidden" name="id" value="@sp.MaSP" />
                                 <input type="number" name="soLuong" value="@sp.SoLuongMua"
                                        min="1"
+                                       max="@sp.SoLuongTon"
                                        class="form-control w-50 d-inline-block" />
                                 <button type="submit" class="btn btn-sm btn-outline-primary">Cập nhật</button>
                             </form>
+                            <small class="text-muted d-block mt-1">Còn: @sp.SoLuongTon</small>
                         </td>
                         <td>@string.Format("{0:N0} đ", sp.DonGia * sp.SoLuongMua)</td>
                         <td>
@@ -65,7 +62,6 @@
                 }
             </tbody>
         </table>
-
         <div class="text-end mt-3">
             <h5>Tổng cộng: <strong class="text-danger">@string.Format("{0:N0} đ", tong)</strong></h5>
             <a href="@Url.Action("DatHang", "KhachHang")" class="btn btn-success mt-3">Tiến hành đặt hàng</a>

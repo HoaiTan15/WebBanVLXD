@@ -5,10 +5,32 @@
 }
 
 <div class="container my-4">
+
+    <!-- HIỂN THỊ THÔNG BÁO -->
+    @if (TempData["Loi"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+            @TempData["Loi"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["UpdateSuccess"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>
+            @TempData["UpdateSuccess"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
     <div class="card shadow-sm p-4">
         <h4 class="mb-3 text-primary">
             <i class="fa-solid fa-user-circle me-2"></i> Thông tin tài khoản
         </h4>
+
+        <!-- THÔNG TIN -->
         <dl class="row mb-0">
             <dt class="col-sm-3">Mã người dùng:</dt>
             <dd class="col-sm-9">@Model.MaUser</dd>
@@ -30,10 +52,62 @@
         </dl>
 
         <div class="mt-4 text-end">
-            <a href="@Url.Action("SuaThongTin", "Account")" class="btn btn-primary me-2">
+            <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editModal">
                 <i class="fa-solid fa-pen-to-square me-1"></i> Chỉnh sửa
-            </a>
+            </button>
+
             <a href="@Url.Action("Index","SanPham")" class="btn btn-outline-secondary">Quay lại</a>
         </div>
     </div>
 </div>
+
+
+<!-- ======================== MODAL SỬA THÔNG TIN ======================== -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form method="post" action="@Url.Action("SuaThongTin", "Account")">
+                @Html.AntiForgeryToken()
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fa-solid fa-pen-to-square me-2"></i> Sửa thông tin
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" name="MaUser" value="@Model.MaUser" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Họ tên</label>
+                        <input type="text" name="TenNguoiDung" class="form-control" value="@Model.TenNguoiDung" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Số điện thoại</label>
+                        <input type="text" name="SDT" class="form-control" value="@Model.SDT" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Địa chỉ</label>
+                        <input type="text" name="DiaChi" class="form-control" value="@Model.DiaChi" />
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
