@@ -3,6 +3,7 @@
     Layout = "~/Views/Shared/_LayoutShop.cshtml";
     ViewBag.Title = Model.TenSP;
 }
+
 <!-- BREADCRUMB -->
 <div class="container mt-3 mb-4">
     <nav aria-label="breadcrumb">
@@ -21,6 +22,7 @@
         </ol>
     </nav>
 </div>
+
 <div class="container my-4">
     <div class="row g-4 bg-white p-4 shadow-sm rounded-3">
 
@@ -36,13 +38,22 @@
 
         <!-- THÔNG TIN SẢN PHẨM -->
         <div class="col-md-7">
-            <h4 class="fw-bold">@Model.TenSP</h4>
-            <div class="bg-light p-3 rounded-3 mb-3">
+
+            <!-- TÊN + NGỪNG KD -->
+            <div class="d-flex align-items-center gap-3">
+                <h4 class="fw-bold mb-0">@Model.TenSP</h4>
+
+                @if (Model.TrangThai != "HoatDong" || Model.SoLuongTon <= 0)
+                {
+                    <span class="badge bg-secondary">Ngừng kinh doanh</span>
+                }
+            </div>
+
+            <div class="bg-light p-3 rounded-3 mb-3 mt-3">
                 <span class="fs-4 text-danger fw-bold">
                     @string.Format("{0:N0} đ", Model.DonGia)
                 </span>
             </div>
-
 
             <div class="mb-3">
                 <strong>Đơn vị tính:</strong> @Model.DonViTinh
@@ -57,6 +68,7 @@
                 <p class="text-muted mt-2">@Model.MoTa</p>
             </div>
 
+            <!-- SỐ LƯỢNG -->
             <div class="d-flex align-items-center mb-4">
                 <label class="me-3 fw-semibold">Số lượng:</label>
                 <div class="input-group" style="width:130px;">
@@ -66,135 +78,73 @@
                 </div>
             </div>
 
-            <div class="d-flex gap-3">
-                <form method="post" action="@Url.Action("ThemVaoGio", "KhachHang")">
-                    <input type="hidden" name="MaSP" value="@Model.MaSP" />
-                    <input type="hidden" name="SoLuong" id="HiddenQty" value="1" />
+            <!-- NÚT THAO TÁC -->
+            @if (Model.TrangThai != "HoatDong" || Model.SoLuongTon <= 0)
+            {
+                <!-- HIỂN THỊ NGỪNG KINH DOANH -->
+                <button class="btn btn-secondary w-100 py-3" disabled>Ngừng kinh doanh</button>
+            }
+            else
+            {
+                <div class="d-flex gap-3">
+                    <!-- THÊM VÀO GIỎ -->
+                    <form method="post" action="@Url.Action("ThemVaoGio", "KhachHang")">
+                        <input type="hidden" name="MaSP" value="@Model.MaSP" />
+                        <input type="hidden" name="SoLuong" id="HiddenQty" value="1" />
 
+                        <button type="submit" class="btn btn-outline-danger px-4">
+                            <i class="fa fa-cart-plus"></i> Thêm vào giỏ hàng
+                        </button>
+                    </form>
 
-                    <button type="submit" class="btn btn-outline-danger px-4">
-                        <i class="fa fa-cart-plus"></i> Thêm vào giỏ hàng
-                    </button>
-                </form>
-                <script>
-                    const qtyInput = document.getElementById("quantity");
-                    const hiddenQty = document.getElementById("HiddenQty");
-                    const plusBtn = document.getElementById("plus");
-                    const minusBtn = document.getElementById("minus");
+                    <!-- MUA NGAY -->
+                    <form method="post" action="@Url.Action("MuaNgay", "KhachHang")">
+                        <input type="hidden" name="MaSP" value="@Model.MaSP" />
+                        <input type="hidden" id="BuyNowQty" name="SoLuong" value="1" />
 
-                    plusBtn.addEventListener("click", () => {
-                        qtyInput.value = parseInt(qtyInput.value) + 1;
-                        hiddenQty.value = qtyInput.value;
-                    });
+                        <button type="submit" class="btn btn-danger px-4">Mua ngay</button>
+                    </form>
+                </div>
+            }
 
-                    minusBtn.addEventListener("click", () => {
-                        if (parseInt(qtyInput.value) > 1) {
-                            qtyInput.value = parseInt(qtyInput.value) - 1;
-                            hiddenQty.value = qtyInput.value;
-                        }
-                    });
-
-                    qtyInput.addEventListener("input", () => {
-                        hiddenQty.value = qtyInput.value;
-                    });
-                </script>
-                <form method="post" action="@Url.Action("MuaNgay", "KhachHang")">
-                    <input type="hidden" name="MaSP" value="@Model.MaSP" />
-                    <input type="hidden" id="BuyNowQty" name="SoLuong" value="1" />
-
-                    <button type="submit" class="btn btn-danger px-4">
-                        Mua ngay
-                    </button>
-                </form>
-            </div>
         </div>
     </div>
 </div>
 
-<!-- JS tăng giảm số lượng -->
 <script>
-    const minus = document.getElementById("minus");
-    const plus = document.getElementById("plus");
-    const qty = document.getElementById("quantity");
-    const hiddenQty = document.getElementById("hiddenQty");
-
-    minus.addEventListener("click", () => {
-        if (qty.value > 1) qty.value--;
-        hiddenQty.value = qty.value;
-    });
-
-    plus.addEventListener("click", () => {
-        qty.value++;
-        hiddenQty.value = qty.value;
-    });
-
-    qty.addEventListener("input", () => hiddenQty.value = qty.value);
-</script>
-<script>
+    const qtyInput = document.getElementById("quantity");
+    const hiddenQty = document.getElementById("HiddenQty");
     const buyNowQty = document.getElementById("BuyNowQty");
 
-    qtyInput.addEventListener("input", () => {
-        buyNowQty.value = qtyInput.value;
+    document.getElementById("plus").addEventListener("click", function () {
+        let qty = parseInt(qtyInput.value);
+        qtyInput.value = qty + 1;
+        hiddenQty.value = qty + 1;
+        buyNowQty.value = qty + 1;
     });
 
-    plusBtn.addEventListener("click", () => {
-        buyNowQty.value = qtyInput.value;
+    document.getElementById("minus").addEventListener("click", function () {
+        let qty = parseInt(qtyInput.value);
+        if (qty > 1) {
+            qtyInput.value = qty - 1;
+            hiddenQty.value = qty - 1;
+            buyNowQty.value = qty - 1;
+        }
     });
 
-    minusBtn.addEventListener("click", () => {
-        buyNowQty.value = qtyInput.value;
+    // Khi người dùng nhập trực tiếp số lượng
+    qtyInput.addEventListener("input", function () {
+        let qty = parseInt(qtyInput.value);
+
+        if (isNaN(qty) || qty < 1) qty = 1;
+
+        qtyInput.value = qty;
+        hiddenQty.value = qty;
+        buyNowQty.value = qty;
     });
 </script>
 
-
 <style>
-    .breadcrumb {
-        background: #f9f9f9;
-        border: 1px solid #eee;
-        font-size: 14px;
-    }
-
-        .breadcrumb a {
-            color: #1a73e8;
-            text-decoration: none;
-        }
-
-            .breadcrumb a:hover {
-                text-decoration: underline;
-            }
-
-    .breadcrumb-item + .breadcrumb-item::before {
-        content: ">";
-        color: #999;
-        margin: 0 6px;
-    }
-
-    body {
-        background: #f5f7fa;
-    }
-
-    .badge {
-        font-size: 0.85rem;
-    }
-
-    .img-thumbnail:hover {
-        border: 2px solid #ff5722;
-        transition: 0.2s;
-    }
-
-    .btn-danger {
-        background-color: #ff5722;
-        border: none;
-    }
-
-        .btn-danger:hover {
-            background-color: #e64a19;
-        }
-
-    .btn-outline-danger:hover {
-        background-color: #ffe4dc;
-    }
-
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button {
         -webkit-appearance: none;
@@ -205,3 +155,5 @@
         -moz-appearance: textfield;
     }
 </style>
+
+

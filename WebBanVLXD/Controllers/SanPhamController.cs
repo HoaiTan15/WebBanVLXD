@@ -78,7 +78,10 @@ namespace WebBanVLXD.Controllers
                         HinhAnh = rd["HinhAnh"].ToString(),
                         MoTa = rd["MoTa"].ToString(),
                         MaNCC = rd["MaNCC"].ToString(),
-                        MaDM = rd["MaDM"].ToString()
+                        MaDM = rd["MaDM"].ToString(),
+                        TrangThai = rd["TrangThai"].ToString()
+
+
                     });
                 }
             }
@@ -122,7 +125,9 @@ namespace WebBanVLXD.Controllers
                         HinhAnh = rd["HinhAnh"].ToString(),
                         MoTa = rd["MoTa"].ToString(),
                         MaNCC = rd["MaNCC"].ToString(),
-                        MaDM = rd["MaDM"].ToString()
+                        MaDM = rd["MaDM"].ToString(),
+                        TrangThai = rd["TrangThai"].ToString()
+
                     };
                 }
             }

@@ -85,6 +85,15 @@
                     <div class="card-body">
                         <h6 class="card-title text-truncate">@sp.TenSP</h6>
                         <p class="text-danger fw-bold">@string.Format("{0:N0} đ", sp.DonGia)</p>
+                        @{
+                            var tt = (sp.TrangThai ?? "").Trim().ToLower();
+                        }
+
+                        @if (tt != "hoatdong" || sp.SoLuongTon <= 0)
+                        {
+                            <span class="badge bg-secondary">Ngừng KD</span>
+                        }
+
                         <a href="@Url.Action("ChiTiet","SanPham", new { id = sp.MaSP.Trim() })"
                            class="btn btn-outline-danger btn-sm w-100">Xem chi tiết</a>
                     </div>

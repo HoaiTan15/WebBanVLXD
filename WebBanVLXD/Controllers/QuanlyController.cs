@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
+using System.Web;
 using System.Web.Mvc;
 using WebBanVLXD.Models;
 
@@ -69,26 +70,90 @@ namespace WebBanVLXD.Controllers
 
             ViewBag.Keyword = keyword;
             ViewBag.TonKho = tonkho;
+            // Lấy danh sách nhà cung cấp
+            var listNCC = new List<NHACUNGCAP>();
+            using (var conn = new SqlConnection(connStr))
+            {
+                string sql = "SELECT MaNCC, TenNCC FROM NHACUNGCAP";
+                var cmd = new SqlCommand(sql, conn);
+                conn.Open();
+                var rd = cmd.ExecuteReader();
+                while (rd.Read())
+                {
+                    listNCC.Add(new NHACUNGCAP
+                    {
+                        MaNCC = rd["MaNCC"].ToString(),
+                        TenNCC = rd["TenNCC"].ToString(),
+                    });
+                }
+            }
+            ViewBag.NCC = listNCC;
+
+
+            var listDM = new List<DANHMUC>();
+            using (var conn = new SqlConnection(connStr))
+            {
+                string sql = "SELECT MaDM, TenDM FROM DANHMUC";
+                var cmd = new SqlCommand(sql, conn);
+                conn.Open();
+                var rd = cmd.ExecuteReader();
+                while (rd.Read())
+                {
+                    listDM.Add(new DANHMUC
+                    {
+                        MaDM = rd["MaDM"].ToString(),
+                        TenDM = rd["TenDM"].ToString(),
+                    });
+                }
+            }
+            ViewBag.DM = listDM;
 
             return View(sanPhams);
         }
 
         // ==================== THÊM SẢN PHẨM ====================
         [HttpPost]
-        public ActionResult ThemSanPham(string ten, decimal dongia, string dvt, int sl, string mota, string mancc, string madm, string hinhanh)
+        public ActionResult ThemSanPham(
+    string ten,
+    decimal dongia,
+    string dvt,
+    int sl,
+    string mota,
+    string mancc,
+    string madm,
+    HttpPostedFileBase hinhanh)
         {
+            // ====== KIỂM TRA THIẾU DỮ LIỆU ======
+            if (string.IsNullOrWhiteSpace(ten) ||
+                string.IsNullOrWhiteSpace(dvt) ||
+                string.IsNullOrWhiteSpace(mancc) ||
+                string.IsNullOrWhiteSpace(madm) ||
+                hinhanh == null || hinhanh.ContentLength == 0)
+            {
+                TempData["ThongBao"] = " Vui lòng nhập đầy đủ thông tin và chọn hình ảnh sản phẩm!";
+                return RedirectToAction("QLSanPham");
+            }
+
+            string fileName = System.IO.Path.GetFileName(hinhanh.FileName);
+            string path = Server.MapPath("~/imagesSanPham/" + fileName);
+            hinhanh.SaveAs(path);
+
+
             using (SqlConnection conn = new SqlConnection(connStr))
             {
-                string sql = @"INSERT INTO SANPHAM (TenSP, DonGia, DonViTinh, SoLuongTon, HinhAnh, MoTa, MaNCC, MaDM) 
-                               VALUES (@ten, @gia, @dvt, @sl, @hinh, @mota, @ncc, @dm)";
+                string sql = @"INSERT INTO SANPHAM 
+                        (TenSP, DonGia, DonViTinh, SoLuongTon, HinhAnh, MoTa, MaNCC, MaDM) 
+                       VALUES 
+                        (@ten, @gia, @dvt, @sl, @hinh, @mota, @ncc, @dm)";
 
                 SqlCommand cmd = new SqlCommand(sql, conn);
+
                 cmd.Parameters.AddWithValue("@ten", ten);
                 cmd.Parameters.AddWithValue("@gia", dongia);
                 cmd.Parameters.AddWithValue("@dvt", dvt);
                 cmd.Parameters.AddWithValue("@sl", sl);
-                cmd.Parameters.AddWithValue("@hinh", hinhanh);
-                cmd.Parameters.AddWithValue("@mota", mota);
+                cmd.Parameters.AddWithValue("@hinh", "imagesSanPham/" + fileName);
+                cmd.Parameters.AddWithValue("@mota", mota ?? "");
                 cmd.Parameters.AddWithValue("@ncc", mancc);
                 cmd.Parameters.AddWithValue("@dm", madm);
 
@@ -96,8 +161,10 @@ namespace WebBanVLXD.Controllers
                 cmd.ExecuteNonQuery();
             }
 
+            TempData["ThongBao"] = " Thêm sản phẩm thành công!";
             return RedirectToAction("QLSanPham");
         }
+
 
         // ==================== XÓA SẢN PHẨM ====================
         [HttpPost]

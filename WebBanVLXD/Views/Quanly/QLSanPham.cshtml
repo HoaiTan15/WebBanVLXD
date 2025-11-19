@@ -30,37 +30,55 @@
     }
 
     <!-- FORM THÊM SẢN PHẨM -->
-    <form action="@Url.Action("ThemSanPham", "QuanLy")" method="post" class="row g-2 mb-4 border p-3 rounded shadow-sm" enctype="multipart/form-data">
-        <div class="col-md-3">
-            <input type="text" name="ten" class="form-control" placeholder="Tên sản phẩm" required />
-        </div>
-        <div class="col-md-2">
-            <input type="number" step="1" name="dongia" class="form-control" placeholder="Đơn giá" required />
-        </div>
-        <div class="col-md-2">
-            <input type="text" name="dvt" class="form-control" placeholder="Đơn vị tính" required />
-        </div>
-        <div class="col-md-1">
-            <input type="number" name="sl" class="form-control" placeholder="SL" required />
-        </div>
-        <div class="col-md-4">
-            <input type="text" name="mota" class="form-control" placeholder="Mô tả" />
-        </div>
-        <div class="col-md-3">
-            <input type="text" name="mancc" class="form-control" placeholder="Mã NCC" />
-        </div>
-        <div class="col-md-3">
-            <input type="text" name="madm" class="form-control" placeholder="Mã DM" />
-        </div>
-        <div class="col-md-3">
-            <input type="file" name="hinhanh" class="form-control" />
-        </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-success w-100">
-                <i class="fa fa-plus"></i> Thêm
-            </button>
-        </div>
-    </form>
+<form action="@Url.Action("ThemSanPham", "QuanLy")" method="post" class="row g-2 mb-4 border p-3 rounded shadow-sm" enctype="multipart/form-data">
+    <div class="col-md-3">
+        <input type="text" name="ten" class="form-control" placeholder="Tên sản phẩm" required />
+    </div>
+    <div class="col-md-2">
+        <input type="number" step="1" name="dongia" class="form-control" placeholder="Đơn giá" required />
+    </div>
+    <div class="col-md-2">
+        <input type="text" name="dvt" class="form-control" placeholder="Đơn vị tính" required />
+    </div>
+    <div class="col-md-1">
+        <input type="number" name="sl" class="form-control" placeholder="SL" required />
+    </div>
+    <div class="col-md-4">
+        <input type="text" name="mota" class="form-control" placeholder="Mô tả" />
+    </div>
+    <div class="col-md-3">
+        <select name="mancc" class="form-control" required>
+            <option value="">-- Chọn nhà cung cấp --</option>
+            @foreach (var ncc in ViewBag.NCC)
+            {
+                <option value="@ncc.MaNCC">@ncc.MaNCC - @ncc.TenNCC</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <select name="madm" class="form-control" required>
+            <option value="">-- Chọn danh mục --</option>
+            @foreach (var dm in ViewBag.DM)
+            {
+                <option value="@dm.MaDM">@dm.MaDM - @dm.TenDM</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <input type="file"
+               name="hinhanh"
+               class="form-control"
+               accept=".jpg, .jpeg, .png"
+               required />
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-success w-100">
+            <i class="fa fa-plus"></i> Thêm
+        </button>
+    </div>
+</form>
 
     <!-- FORM LỌC -->
     <form method="get" action="@Url.Action("QLSanPham", "QuanLy")" class="d-flex mb-3">

@@ -187,7 +187,43 @@ namespace WebBanVLXD.Controllers
                     });
                 }
             }
+            // Lấy danh sách nhà cung cấp
+            var listNCC = new List<NHACUNGCAP>();
+            using (var conn = new SqlConnection(connStr))
+            {
+                string sql = "SELECT MaNCC, TenNCC FROM NHACUNGCAP";
+                var cmd = new SqlCommand(sql, conn);
+                conn.Open();
+                var rd = cmd.ExecuteReader();
+                while (rd.Read())
+                {
+                    listNCC.Add(new NHACUNGCAP
+                    {
+                        MaNCC = rd["MaNCC"].ToString(),
+                        TenNCC = rd["TenNCC"].ToString(),
+                    });
+                }
+            }
+            ViewBag.NCC = listNCC;
 
+
+            var listDM = new List<DANHMUC>();
+            using (var conn = new SqlConnection(connStr))
+            {
+                string sql = "SELECT MaDM, TenDM FROM DANHMUC";
+                var cmd = new SqlCommand(sql, conn);
+                conn.Open();
+                var rd = cmd.ExecuteReader();
+                while (rd.Read())
+                {
+                    listDM.Add(new DANHMUC
+                    {
+                        MaDM = rd["MaDM"].ToString(),
+                        TenDM = rd["TenDM"].ToString(),
+                    });
+                }
+            }
+            ViewBag.DM = listDM;
             return View(list);
         }
 

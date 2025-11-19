@@ -14,10 +14,20 @@
         </div>
     </div>
 </div>
+
 <div class="container mt-4 mb-5">
     <h3 class="fw-bold text-primary mb-3">
         <i class="fa fa-cubes"></i> Danh sách sản phẩm
     </h3>
+
+    <!-- THÔNG BÁO -->
+    @if (TempData["ThongBao"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa fa-check-circle"></i> @TempData["ThongBao"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
 
     <!-- Form thêm sản phẩm -->
     <div class="card shadow-sm mb-4">
@@ -29,27 +39,51 @@
                 <div class="col-md-3">
                     <input name="ten" class="form-control" placeholder="Tên sản phẩm" required />
                 </div>
+
                 <div class="col-md-2">
-                    <input name="dongia" type="number" class="form-control" placeholder="Đơn giá" required />
+                    <input name="dongia" type="number" step="1" class="form-control" placeholder="Đơn giá" required />
                 </div>
+
                 <div class="col-md-2">
-                    <input name="dvt" class="form-control" placeholder="Đơn vị tính" />
+                    <input name="dvt" class="form-control" placeholder="Đơn vị tính" required />
                 </div>
+
                 <div class="col-md-1">
-                    <input name="sl" type="number" class="form-control" placeholder="SL" />
+                    <input name="sl" type="number" class="form-control" placeholder="SL" required />
                 </div>
-                <div class="col-md-2">
-                    <input type="file" name="uploadFile" class="form-control" accept="image/*" required />
+
+                <div class="col-md-4">
+                    <textarea name="mota" class="form-control" rows="1" placeholder="Mô tả"></textarea>
                 </div>
-                <div class="col-md-12">
-                    <textarea name="mota" class="form-control" rows="2" placeholder="Mô tả"></textarea>
+
+                <div class="col-md-3">
+                    <select name="mancc" class="form-control" required>
+                        <option value="">-- Chọn nhà cung cấp --</option>
+                        @foreach (var ncc in ViewBag.NCC)
+                        {
+                            <option value="@ncc.MaNCC">@ncc.MaNCC - @ncc.TenNCC</option>
+                        }
+                    </select>
                 </div>
-                <div class="col-md-2">
-                    <input name="mancc" class="form-control" placeholder="Mã NCC" />
+
+                <div class="col-md-3">
+                    <select name="madm" class="form-control" required>
+                        <option value="">-- Chọn danh mục --</option>
+                        @foreach (var dm in ViewBag.DM)
+                        {
+                            <option value="@dm.MaDM">@dm.MaDM - @dm.TenDM</option>
+                        }
+                    </select>
                 </div>
-                <div class="col-md-2">
-                    <input name="madm" class="form-control" placeholder="Mã DM" />
+
+                <div class="col-md-3">
+                    <input type="file"
+                           name="uploadFile"
+                           class="form-control"
+                           accept=".jpg,.jpeg,.png"
+                           required />
                 </div>
+
                 <div class="col-md-2">
                     <button type="submit" class="btn btn-success w-100">
                         <i class="fa fa-plus"></i> Thêm
