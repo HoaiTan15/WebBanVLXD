@@ -25,19 +25,18 @@ namespace WebBanVLXD.Controllers
         }
 
         // =============================
-        // THÊM VÀO GIỎ
+        // THÊM VÀO GIỎ (HỖ TRỢ AJAX)
         // =============================
         [HttpPost]
-        public ActionResult ThemVaoGio(FormCollection form)
+        public ActionResult ThemVaoGio(string MaSP, int SoLuong = 1)
         {
             if (Session["UserID"] == null)
             {
-                TempData["Loi"] = "Bạn cần đăng nhập để thêm sản phẩm vào giỏ!";
-                return RedirectToAction("Login", "Account");
+                return Json(new { requireLogin = true });
             }
 
-            string id = form["MaSP"];
-            int soLuong = Convert.ToInt32(form["SoLuong"]);
+            if (string.IsNullOrEmpty(MaSP))
+                return Json(new { success = false, message = "Dữ liệu không hợp lệ!" });
 
             using (SqlConnection conn = new SqlConnection(connStr))
             {
@@ -45,33 +44,33 @@ namespace WebBanVLXD.Controllers
 
                 string sql = "SELECT MaSP, TenSP, DonGia, SoLuongTon, HinhAnh FROM SANPHAM WHERE MaSP=@id";
                 SqlCommand cmd = new SqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@id", id);
+                cmd.Parameters.AddWithValue("@id", MaSP);
 
                 SqlDataReader rd = cmd.ExecuteReader();
+
                 if (!rd.Read())
                 {
-                    TempData["Loi"] = "Sản phẩm không tồn tại!";
-                    return RedirectToAction("GioHang");
+                    return Json(new { success = false, message = "Sản phẩm không tồn tại!" });
                 }
 
                 int tonKho = Convert.ToInt32(rd["SoLuongTon"]);
-                if (soLuong > tonKho)
+
+                if (SoLuong > tonKho)
                 {
-                    TempData["Loi"] = $"Chỉ còn {tonKho} sản phẩm!";
-                    return RedirectToAction("GioHang");
+                    return Json(new { success = false, message = $"Chỉ còn {tonKho} sản phẩm!" });
                 }
 
                 var cart = Session["Cart"] as List<SANPHAM> ?? new List<SANPHAM>();
-                var existing = cart.FirstOrDefault(x => x.MaSP == id);
+                var existing = cart.FirstOrDefault(x => x.MaSP == MaSP);
 
                 if (existing != null)
                 {
-                    if (existing.SoLuongMua + soLuong > tonKho)
+                    if (existing.SoLuongMua + SoLuong > tonKho)
                     {
-                        TempData["Loi"] = $"Vượt quá tồn kho! Chỉ còn {tonKho}.";
-                        return RedirectToAction("GioHang");
+                        return Json(new { success = false, message = $"Vượt quá tồn kho! Chỉ còn {tonKho}." });
                     }
-                    existing.SoLuongMua += soLuong;
+
+                    existing.SoLuongMua += SoLuong;
                 }
                 else
                 {
@@ -82,15 +81,19 @@ namespace WebBanVLXD.Controllers
                         DonGia = Convert.ToDecimal(rd["DonGia"]),
                         SoLuongTon = tonKho,
                         HinhAnh = rd["HinhAnh"].ToString(),
-                        SoLuongMua = soLuong
+                        SoLuongMua = SoLuong
                     });
                 }
 
                 Session["Cart"] = cart;
             }
 
-            TempData["ThongBao"] = "✔ Thêm vào giỏ thành công!";
-            return RedirectToAction("GioHang");
+            return Json(new
+            {
+                success = true,
+                message = "Thêm vào giỏ thành công!",
+                cartCount = (Session["Cart"] as List<SANPHAM>)?.Count ?? 0
+            });
         }
 
         // =============================
@@ -180,7 +183,6 @@ namespace WebBanVLXD.Controllers
 
             string maKH = Session["UserID"].ToString();
 
-            // Kiểm tra SDT và địa chỉ
             string sdt = null, diachi = null;
 
             using (SqlConnection conn = new SqlConnection(connStr))
@@ -201,11 +203,10 @@ namespace WebBanVLXD.Controllers
 
             if (string.IsNullOrWhiteSpace(sdt) || string.IsNullOrWhiteSpace(diachi))
             {
-                TempData["Loi"] = "Bạn cần cập nhật đầy đủ SỐ ĐIỆN THOẠI và ĐỊA CHỈ trước khi đặt hàng!";
+                TempData["Loi"] = "Bạn cần cập nhật SỐ ĐIỆN THOẠI và ĐỊA CHỈ trước khi đặt hàng!";
                 return RedirectToAction("ThongTin", "Account");
             }
 
-            // Tạo hóa đơn
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 conn.Open();

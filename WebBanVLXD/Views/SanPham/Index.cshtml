@@ -22,8 +22,6 @@
     </div>
 }
 
-
-
 <!-- ========================== QUẢN LÝ ========================== -->
 @{
     var role = Session["Role"] as string;
@@ -63,6 +61,7 @@
         }
     </div>
 </div>
+
 <!-- ========================== SORT + SẢN PHẨM ========================== -->
 <div class="container mt-5">
 
@@ -79,23 +78,26 @@
     <div class="row row-cols-2 row-cols-md-4 g-4" id="productContainer">
         @foreach (var sp in Model)
         {
+            var tt = (sp.TrangThai ?? "").Trim().ToLower();
+
             <div class="col product-card" data-price="@sp.DonGia">
                 <div class="card h-100 shadow-sm border-0">
                     <img src="~/@sp.HinhAnh" class="card-img-top" style="height:180px;object-fit:cover;">
                     <div class="card-body">
                         <h6 class="card-title text-truncate">@sp.TenSP</h6>
+
                         <p class="text-danger fw-bold">@string.Format("{0:N0} đ", sp.DonGia)</p>
-                        @{
-                            var tt = (sp.TrangThai ?? "").Trim().ToLower();
-                        }
 
                         @if (tt != "hoatdong" || sp.SoLuongTon <= 0)
                         {
-                            <span class="badge bg-secondary">Ngừng KD</span>
+                            <span class="badge bg-secondary mb-2">Ngừng KD</span>
                         }
 
                         <a href="@Url.Action("ChiTiet","SanPham", new { id = sp.MaSP.Trim() })"
-                           class="btn btn-outline-danger btn-sm w-100">Xem chi tiết</a>
+                           class="btn btn-outline-danger btn-sm w-100 mb-2">
+                            Xem chi tiết
+                        </a>
+
                     </div>
                 </div>
             </div>
@@ -104,6 +106,7 @@
 </div>
 
 @section scripts{
+    <!-- SORT -->
     <script>
         document.getElementById("sortPrice").addEventListener("change", function () {
 
@@ -120,6 +123,48 @@
 
             items.forEach(item => container.appendChild(item));
         });
+    </script>
+
+    <!-- AJAX THÊM GIỎ -->
+    <script>
+        function addToCart(maSP) {
+
+            $.ajax({
+                url: '/KhachHang/ThemVaoGio',
+                type: 'POST',
+                data: { MaSP: maSP, SoLuong: 1 },
+
+                success: function (res) {
+                    if (res.success) {
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Đã thêm vào giỏ!',
+                            text: res.message,
+                            timer: 1200,
+                            showConfirmButton: false
+                        });
+
+                        $("#cart-count").text(res.cartCount);
+                    }
+                    else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi',
+                            text: res.message
+                        });
+                    }
+                },
+
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi hệ thống!',
+                        text: 'Không thể thêm sản phẩm!'
+                    });
+                }
+            });
+        }
     </script>
 }
 
